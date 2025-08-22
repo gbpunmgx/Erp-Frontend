@@ -1,8 +1,8 @@
 import ApiClient from "@/lib/api/api-client";
-import { API_PATHS } from "@/config/api-paths";
 import { ApiResponseList } from "@/core/entities/api-response-list";
 import { ApiResponseSingle } from "@/core/entities/api-response-single";
 import { OrganizationBase, OrganizationWithId } from "@/app/(main)/features/organization/all/types/organization-type";
+import { ENDPOINTS } from "@/utils/endpoints";
 
 const apiClient = ApiClient.getInstance();
 
@@ -43,7 +43,7 @@ const transformOrganization = (data: unknown): OrganizationWithId => {
 
 export const getAllOrganizations = async (): Promise<OrganizationWithId[]> => {
   try {
-    const json = await apiClient.get(API_PATHS.ORGANIZATION_ALL);
+    const json = await apiClient.get(ENDPOINTS.CUSTOMERS.LIST);
     const response = ApiResponseList.fromJson<OrganizationWithId>(
       json as Record<string, unknown>,
       transformOrganization,
@@ -61,7 +61,7 @@ export const getOrganizationById = async (id: number): Promise<OrganizationWithI
   }
 
   try {
-    const json = await apiClient.get(`${API_PATHS.ORGANIZATION}/${id}`);
+    const json = await apiClient.get(ENDPOINTS.CUSTOMERS.LIST);
     const response = ApiResponseSingle.fromJson<OrganizationWithId>(
       json as Record<string, unknown>,
       transformOrganization,
@@ -79,7 +79,7 @@ export const createOrganization = async (organization: OrganizationBase): Promis
   }
 
   try {
-    const json = await apiClient.post(API_PATHS.ORGANIZATION, organization);
+    const json = await apiClient.post(ENDPOINTS.CUSTOMERS.LIST, organization);
     const response = ApiResponseSingle.fromJson<OrganizationWithId>(
       json as Record<string, unknown>,
       transformOrganization,
@@ -97,7 +97,7 @@ export const updateOrganization = async (organization: OrganizationWithId): Prom
   }
 
   try {
-    const json = await apiClient.put(`${API_PATHS.ORGANIZATION}/${organization.id}`, organization);
+    const json = await apiClient.put(`${ENDPOINTS.CUSTOMERS.LIST}/${organization.id}`, organization);
     const response = ApiResponseSingle.fromJson<OrganizationWithId>(
       json as Record<string, unknown>,
       transformOrganization,
@@ -115,7 +115,7 @@ export const deleteOrganization = async (id: number): Promise<void> => {
   }
 
   try {
-    await apiClient.delete(`${API_PATHS.ORGANIZATION}/${id}`);
+    await apiClient.delete(`${ENDPOINTS.CUSTOMERS.LIST}/${id}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to delete organization with ID ${id}: ${message}`);

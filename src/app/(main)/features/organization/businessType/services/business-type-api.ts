@@ -1,8 +1,8 @@
 import ApiClient from "@/lib/api/api-client";
-import { API_PATHS } from "@/config/api-paths";
 import { BusinessTypeBase, BusinessTypeWithId } from "../types/business-type";
 import { ApiResponseList } from "@/core/entities/api-response-list";
 import { ApiResponseSingle } from "@/core/entities/api-response-single";
+import { ENDPOINTS } from "@/utils/endpoints";
 
 const apiClient = ApiClient.getInstance();
 
@@ -28,7 +28,7 @@ const transformBusinessType = (data: unknown): BusinessTypeWithId => {
 
 export const getAllBusinessTypes = async (): Promise<BusinessTypeWithId[]> => {
   try {
-    const json = await apiClient.get(API_PATHS.BUSINESS_TYPE_ALL);
+    const json = await apiClient.get(ENDPOINTS.CUSTOMERS.LIST);
     const response = ApiResponseList.fromJson<BusinessTypeWithId>(
       json as Record<string, unknown>,
       transformBusinessType,
@@ -49,7 +49,7 @@ export const getBusinessTypeById = async (id: number): Promise<BusinessTypeWithI
   }
 
   try {
-    const json = await apiClient.get(`${API_PATHS.BUSINESS_TYPE}/${id}`);
+    const json = await apiClient.get(`${ENDPOINTS.CUSTOMERS.LIST}/${id}`);
     const response = ApiResponseSingle.fromJson<BusinessTypeWithId>(
       json as Record<string, unknown>,
       transformBusinessType,
@@ -70,7 +70,7 @@ export const createBusinessType = async (businessType: BusinessTypeBase): Promis
   }
 
   try {
-    const json = await apiClient.post(API_PATHS.BUSINESS_TYPE, businessType);
+    const json = await apiClient.post(ENDPOINTS.CUSTOMERS.LIST, businessType);
     const response = ApiResponseSingle.fromJson<BusinessTypeBase>(
       json as Record<string, unknown>,
       transformBusinessType,
@@ -91,7 +91,7 @@ export const updateBusinessType = async (businessType: BusinessTypeWithId): Prom
   }
 
   try {
-    const json = await apiClient.put(`${API_PATHS.BUSINESS_TYPE}/${businessType.id}`, businessType);
+    const json = await apiClient.put(`${ENDPOINTS.CUSTOMERS.LIST}/${businessType.id}`, businessType);
     const response = ApiResponseSingle.fromJson<BusinessTypeWithId>(
       json as Record<string, unknown>,
       transformBusinessType,
@@ -112,7 +112,7 @@ export const deleteBusinessType = async (id: number): Promise<void> => {
   }
 
   try {
-    await apiClient.delete(`${API_PATHS.BUSINESS_TYPE}/${id}`);
+    await apiClient.delete(`${ENDPOINTS.CUSTOMERS.LIST}/${id}`);
   } catch (error) {
     const errorMessage =
       error instanceof Error
