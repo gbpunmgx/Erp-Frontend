@@ -1,92 +1,54 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Package, DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TopCardProps } from "./types/types";
+import TopCard from "@/components/dashboard/common-card";
+import SalesRevenuePanel from "@/components/dashboard/charts-panel";
 
 export default function Dashboard() {
+  const stats: TopCardProps[] = [
+    {
+      title: "Total Products",
+      description: "Till Date",
+      value: "1,525",
+      icon: <Package className="text-muted-foreground h-6 w-6" />,
+      hoverColor: "hover:border-red-600",
+    },
+    {
+      title: "Total Sales",
+      description: "Till Date",
+      value: "10,892",
+      icon: <ShoppingCart className="text-muted-foreground h-6 w-6" />,
+      hoverColor: "hover:border-blue-600",
+    },
+    {
+      title: "Total Income",
+      description: "This Month",
+      value: "$157,342",
+      icon: <DollarSign className="text-muted-foreground h-6 w-6" />,
+      hoverColor: "hover:border-green-600",
+    },
+    {
+      title: "Total Expenses",
+      description: "This Month",
+      value: "$17,342",
+      icon: <TrendingUp className="text-muted-foreground h-6 w-6" />,
+      hoverColor: "hover:border-purple-600",
+    },
+  ];
   return (
     <div className="space-y-6 p-6">
-      {/* Top Stats Row */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="w-full py-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-              <CardDescription>Till Date</CardDescription>
-            </div>
-            <Package className="text-muted-foreground h-6 w-6" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">1,525</p>
-          </CardContent>
-        </Card>
-
-        <Card className="w-full py-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-              <CardDescription>Till Date</CardDescription>
-            </div>
-            <ShoppingCart className="text-muted-foreground h-6 w-6" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">10,892</p>
-          </CardContent>
-        </Card>
-
-        <Card className="w-full py-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-              <CardDescription>This Month</CardDescription>
-            </div>
-            <DollarSign className="text-muted-foreground h-6 w-6" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-green-600">$157,342</p>
-          </CardContent>
-        </Card>
-
-        <Card className="w-full py-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-              <CardDescription>This Month</CardDescription>
-            </div>
-            <TrendingUp className="text-muted-foreground h-6 w-6" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-red-600">$12,453</p>
-          </CardContent>
-        </Card>
+        {stats.map((stat, i) => (
+          <TopCard key={i} {...stat} />
+        ))}
       </div>
 
       {/* Middle Section */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Sales Revenue Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex items-center justify-between">
-            <CardTitle>Sales Revenue</CardTitle>
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline">
-                Monthly
-              </Button>
-              <Button size="sm" variant="ghost">
-                Quarterly
-              </Button>
-              <Button size="sm" variant="ghost">
-                Yearly
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {/* Replace with a chart component like recharts */}
-            <div className="text-muted-foreground flex h-64 items-center justify-center rounded-md border">
-              Chart Placeholder
-            </div>
-          </CardContent>
-        </Card>
-
+        <SalesRevenuePanel />
         {/* Top Categories Pie Chart */}
+
         <Card>
           <CardHeader className="flex items-center justify-between">
             <CardTitle>Top Categories</CardTitle>
