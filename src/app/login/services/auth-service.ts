@@ -1,5 +1,6 @@
 import ApiClient, { setAccessToken, getAccessToken } from "@/lib/api/api-client";
 import { ENDPOINTS } from "@/utils/endpoints";
+import Cookies from "js-cookie";
 
 export interface LoginResponse {
   accessToken: string;
@@ -10,20 +11,23 @@ class AuthService {
   private api = ApiClient.getInstance();
 
   async login(username: string, password: string): Promise<LoginResponse> {
-    const res = await this.api.post<{ data: LoginResponse; message: string }>(
-      ENDPOINTS.AUTH.LOGIN,
-      { username, password }
-    );
+    const res = await this.api.post<{ data: LoginResponse; message: string }>(ENDPOINTS.AUTH.LOGIN, {
+      username,
+      password,
+    });
+
+    Cookies.set("accessToken", res.data.accessToken, {
+      expires: 7,
+      secure: true,
+      sameSite: "Strict",
+    });
 
     setAccessToken(res.data.accessToken);
     return res.data;
   }
 
   async refreshToken(): Promise<LoginResponse> {
-    const res = await this.api.post<{ data: LoginResponse; message: string }>(
-      ENDPOINTS.AUTH.REFRESH,
-      null
-    );
+    const res = await this.api.post<{ data: LoginResponse; message: string }>(ENDPOINTS.AUTH.REFRESH, null);
 
     if (res?.data?.accessToken) {
       setAccessToken(res.data.accessToken);
