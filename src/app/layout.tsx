@@ -1,4 +1,3 @@
-/* eslint-disable import/order */
 import { ReactNode } from "react";
 
 import type { Metadata } from "next";

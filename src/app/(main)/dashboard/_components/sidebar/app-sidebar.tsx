@@ -1,4 +1,3 @@
-/* eslint-disable import/order */
 "use client";
 import React from "react";
 import { Command } from "lucide-react";

@@ -60,7 +60,6 @@ class SocketService {
       webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_API_URL}ws`),
       connectHeaders: {
         Authorization: token ? `Bearer ${token}` : "",
-        // ✅ Fixed ESLint: use nullish coalescing operator
         "X-Refresh-Token": Cookies.get("refreshToken") ?? "",
         "X-Client-Id": "react-client",
       },

@@ -146,11 +146,23 @@ class ApiClient {
     return this.request<T>(endpoint, "GET", null, queryParams, customHeaders, timeoutMs);
   }
 
-  async post<T = unknown>(endpoint: string, body: unknown, customHeaders = {}, queryParams = {}, timeoutMs = 30000): Promise<T> {
+  async post<T = unknown>(
+    endpoint: string,
+    body: unknown,
+    customHeaders = {},
+    queryParams = {},
+    timeoutMs = 30000,
+  ): Promise<T> {
     return this.request<T>(endpoint, "POST", body, queryParams, customHeaders, timeoutMs);
   }
 
-  async put<T = unknown>(endpoint: string, body: unknown, customHeaders = {}, queryParams = {}, timeoutMs = 30000): Promise<T> {
+  async put<T = unknown>(
+    endpoint: string,
+    body: unknown,
+    customHeaders = {},
+    queryParams = {},
+    timeoutMs = 30000,
+  ): Promise<T> {
     return this.request<T>(endpoint, "PUT", body, queryParams, customHeaders, timeoutMs);
   }
 
