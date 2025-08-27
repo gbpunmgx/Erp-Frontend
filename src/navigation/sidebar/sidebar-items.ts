@@ -57,6 +57,18 @@ export const sidebarItems: NavGroup[] = [
         ],
       },
       {
+        title: "Purchase",
+        url: "/purchase",
+        icon: Users,
+        subItems: [
+          {
+            title: "Purchase Entry",
+            url: "/purchase",
+            icon: Users,
+          },
+        ],
+      },
+      {
         title: "Categories",
         url: "/features/category",
         icon: BookA,
