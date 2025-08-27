@@ -14,6 +14,8 @@ export default function PurchaseEntryPage() {
     { product: "", description: "", quantity: 0, unitPrice: 0, total: 0 },
   ]);
 
+  const [discount, setDiscount] = useState<number>(0); // new field
+
   // Mock Products with default prices
   const products: Record<string, number> = {
     Laptop: 800,
@@ -31,12 +33,11 @@ export default function PurchaseEntryPage() {
     setItems([...items, { product: "", description: "", quantity: 0, unitPrice: 0, total: 0 }]);
   };
 
-  // Update Row (generic + type-safe)
+  // Update Row
   function updateRow<K extends keyof PurchaseItem>(index: number, field: K, value: PurchaseItem[K]) {
     const updated = [...items];
     updated[index][field] = value;
 
-    // Auto update description & price if product changes
     if (field === "product") {
       const price = products[value as string] || 0;
       updated[index].unitPrice = price;
@@ -45,7 +46,6 @@ export default function PurchaseEntryPage() {
       }
     }
 
-    // Auto recalc total if qty or price changes
     if (field === "quantity" || field === "unitPrice" || field === "product") {
       updated[index].total = updated[index].quantity * updated[index].unitPrice;
     }
@@ -55,8 +55,9 @@ export default function PurchaseEntryPage() {
 
   // Totals
   const subtotal = items.reduce((sum, r) => sum + r.total, 0);
-  const vat = subtotal * 0.13; // 13% VAT
-  const grandTotal = subtotal + vat;
+  const discountApplied = Math.min(discount, subtotal); // prevent negative totals
+  const vat = (subtotal - discountApplied) * 0.13; // VAT on net amount
+  const grandTotal = subtotal - discountApplied + vat;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -91,7 +92,7 @@ export default function PurchaseEntryPage() {
           </div>
           <div>
             <label className="mb-1 block text-sm text-gray-600">Invoice Number</label>
-            <input type="text" className="w-full rounded-lg border px-3 py-2" placeholder="INV-0001" />
+            <input type="text" className="w-full rounded-lg border px-3 py-2" placeholder="PI01-ORG-0001" />
           </div>
           <div>
             <label className="mb-1 block text-sm text-gray-600">Purchase Date</label>
@@ -168,7 +169,7 @@ export default function PurchaseEntryPage() {
         </button>
 
         {/* Totals */}
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label className="mb-1 block text-sm text-gray-600">Subtotal</label>
             <input
@@ -176,6 +177,16 @@ export default function PurchaseEntryPage() {
               className="w-full rounded-lg border px-3 py-2"
               value={`$${subtotal.toLocaleString()}`}
               readOnly
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-gray-600">Discount</label>
+            <input
+              type="number"
+              className="w-full rounded-lg border px-3 py-2 text-red-600"
+              value={discount || ""}
+              onChange={(e) => setDiscount(Number(e.target.value))}
+              placeholder="0"
             />
           </div>
           <div>
