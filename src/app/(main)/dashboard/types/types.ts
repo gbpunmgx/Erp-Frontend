@@ -7,6 +7,6 @@ export interface TopCardProps {
 }
 
 export interface RevenuePoint {
-  date: string;
-  revenue: number;
+  name: string;
+  value: number;
 }
