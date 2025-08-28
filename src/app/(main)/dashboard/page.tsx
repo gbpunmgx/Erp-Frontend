@@ -1,9 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Package, DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TopCardProps } from "./types/types";
+import { RevenuePoint, TopCardProps } from "./types/types";
 import TopCard from "@/components/dashboard/common-card";
-import SalesRevenuePanel from "@/components/dashboard/charts-panel";
+import SalesRevenuePanel, { SalesTopCategory } from "@/components/dashboard/charts-panel";
 
 export default function Dashboard() {
   const stats: TopCardProps[] = [
@@ -44,25 +44,9 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Middle Section */}
       <div className="grid gap-6 lg:grid-cols-3">
         <SalesRevenuePanel />
-        {/* Top Categories Pie Chart */}
-
-        <Card>
-          <CardHeader className="flex items-center justify-between">
-            <CardTitle>Top Categories</CardTitle>
-            <Button size="sm" variant="outline">
-              See All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {/* Replace with Pie chart */}
-            <div className="text-muted-foreground flex h-64 items-center justify-center rounded-md border">
-              Pie Chart Placeholder
-            </div>
-          </CardContent>
-        </Card>
+        <SalesTopCategory />
       </div>
 
       {/* Bottom Section */}

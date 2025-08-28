@@ -1,10 +1,10 @@
 "use client";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import SalesRevenueChart from "./charts";
+import SalesRevenueChart, { SalesCategoryPieChart } from "./charts";
 import { RevenuePoint } from "@/app/(main)/dashboard/types/types";
 import { useState } from "react";
-import { getSalesData, SalesPeriod } from "@/app/(main)/dashboard/services/chart-data";
+import { getSalesData, getTopSalesCategories, SalesPeriod } from "@/app/(main)/dashboard/services/chart-data";
 
 export default function SalesRevenuePanel() {
   const [period, setPeriod] = useState<SalesPeriod>("monthly");
@@ -33,8 +33,21 @@ export default function SalesRevenuePanel() {
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3">
         <SalesRevenueChart data={data} />
+      </CardContent>
+    </Card>
+  );
+}
+export function SalesTopCategory() {
+  const pieData: RevenuePoint[] = getTopSalesCategories();
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Top Categories</CardTitle>
+      </CardHeader>
+      <CardContent className="p-3">
+        <SalesCategoryPieChart data={pieData} />
       </CardContent>
     </Card>
   );
