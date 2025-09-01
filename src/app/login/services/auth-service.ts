@@ -1,9 +1,7 @@
-import ApiClient, { setAccessToken, getAccessToken } from "@/lib/api/api-client";
+import ApiClient from "@/lib/api/api-client";
 import { ENDPOINTS } from "@/utils/endpoints";
-import Cookies from "js-cookie";
 
 export interface LoginResponse {
-  accessToken: string;
   authorities: string[];
 }
 
@@ -15,33 +13,16 @@ class AuthService {
       username,
       password,
     });
-
-    Cookies.set("accessToken", res.data.accessToken, {
-      expires: 7,
-      secure: true,
-      sameSite: "Strict",
-    });
-
-    setAccessToken(res.data.accessToken);
     return res.data;
   }
 
   async refreshToken(): Promise<LoginResponse> {
     const res = await this.api.post<{ data: LoginResponse; message: string }>(ENDPOINTS.AUTH.REFRESH, null);
-
-    if (res?.data?.accessToken) {
-      setAccessToken(res.data.accessToken);
-    }
-
     return res.data;
   }
 
-  logout() {
-    setAccessToken(null);
-  }
-
-  getAccessToken(): string | null {
-    return getAccessToken();
+  async logout(): Promise<void> {
+    await this.api.post(ENDPOINTS.AUTH.LOGOUT, null);
   }
 }
 

@@ -1,13 +1,5 @@
 import { ApiError } from "@/lib/api/api-error";
 
-let accessToken: string | null = null;
-
-export const setAccessToken = (token: string | null) => {
-  accessToken = token;
-};
-
-export const getAccessToken = () => accessToken;
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 class ApiClient {
@@ -103,19 +95,13 @@ class ApiClient {
     if (!response.ok) {
       if (response.status === 401 && !retrying) {
         try {
-          const refreshRes = await this.post<{ data: { accessToken: string } }>("auth/refresh", null);
-          if (refreshRes?.data?.accessToken) {
-            setAccessToken(refreshRes.data.accessToken);
-            options.headers = {
-              ...(options.headers as Record<string, string>),
-              Authorization: `Bearer ${refreshRes.data.accessToken}`,
-            };
-            const retryRes = await this.executeFetch(url, options, timeoutMs);
-            return this.parseResponseBody<T>(retryRes, url);
-          }
+          // Attempt to refresh the token; cookie will be updated by the server
+          await this.post("auth/refresh", null);
+          // Retry the original request with the new cookie
+          const retryRes = await this.executeFetch(url, options, timeoutMs);
+          return this.parseResponseBody<T>(retryRes, url);
         } catch (err) {
           console.error("Refresh token failed", err);
-          setAccessToken(null);
           throw new ApiError(401, "Unauthorized, please login again.", { err });
         }
       }
@@ -133,9 +119,7 @@ class ApiClient {
     timeoutMs: number = 30000,
   ): Promise<T> {
     const headers: Record<string, string> = { ...this.headers, ...customHeaders };
-    if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
-
-    const options: RequestInit = { method, headers };
+    const options: RequestInit = { method, headers, credentials: "include" };
     if (body) options.body = headers["Content-Type"] === "application/json" ? JSON.stringify(body) : (body as BodyInit);
 
     const url = this.buildUrl(endpoint, queryParams);
