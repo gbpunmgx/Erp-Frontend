@@ -102,6 +102,25 @@ export const sidebarItems: NavGroup[] = [
   },
   {
     id: 4,
+    label: "Live Location",
+    items: [
+      {
+        title: "Live Location",
+        url: "/features/live_location",
+        icon: ReceiptText,
+        subItems: [
+          {
+            title: "Live Location",
+            url: "/features/live_location",
+            icon: ReceiptText,
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 5,
     label: "Subscription Management",
     items: [
       {
