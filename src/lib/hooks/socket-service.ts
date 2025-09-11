@@ -22,7 +22,7 @@ class SocketService {
   async connect(): Promise<void> {
     if (this.connected && this.client?.connected) return;
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}${process.env.NEXT_PUBLIC_WS_PATH}`;
+    const wsUrl = `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_WS_PATH}`;
     console.log("Connecting to WebSocket URL:", wsUrl);
 
     this.client = new Client({

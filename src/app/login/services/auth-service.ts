@@ -15,15 +15,6 @@ class AuthService {
     });
     return res.data;
   }
-
-  async refreshToken(): Promise<LoginResponse> {
-    const res = await this.api.post<{ data: LoginResponse; message: string }>(ENDPOINTS.AUTH.REFRESH, null);
-    return res.data;
-  }
-
-  async logout(): Promise<void> {
-    await this.api.post(ENDPOINTS.AUTH.LOGOUT, null);
-  }
 }
 
 export default new AuthService();

@@ -23,7 +23,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     setError("");
 
     try {
-      const { accessToken, authorities } = await authService.login(username, password);
+      const { authorities } = await authService.login(username, password);
 
       console.log("Logged in user roles/permissions:", authorities);
 
@@ -40,20 +40,19 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
+          Enter your username below to login to your account
         </p>
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <div className="grid gap-6">
-        {/* Username Field */}
         <div className="grid gap-3">
-          <Label htmlFor="username">Email</Label>
+          <Label htmlFor="username">Username</Label>
           <Input
             id="username"
             type="text"
-            placeholder="m@example.com"
+            placeholder="Enter your username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required

@@ -19,10 +19,6 @@ class ApiClient {
     return ApiClient.instance;
   }
 
-  static resetInstance(baseURL: string): void {
-    ApiClient.instance = new ApiClient(baseURL);
-  }
-
   private buildUrl(endpoint: string, queryParams: Record<string, string | number | boolean> = {}): string {
     const url = new URL(`${this.baseURL}${endpoint.startsWith("/") ? endpoint.slice(1) : endpoint}`);
     Object.entries(queryParams).forEach(([key, value]) => url.searchParams.append(key, value.toString()));
@@ -59,7 +55,7 @@ class ApiClient {
   }
 
   private getMessageFromResponseBody(body: unknown): string | undefined {
-    if (typeof body === "object" && body !== null && "message" in body && typeof (body as any).message === "string") {
+    if (typeof body === "object" && body !== null && "message" in body) {
       return (body as any).message;
     }
     return undefined;
@@ -72,7 +68,7 @@ class ApiClient {
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
-        credentials: "include",
+        credentials: "include", // ✅ include HTTP-only cookies
       });
       clearTimeout(timeout);
       return response;
@@ -88,25 +84,15 @@ class ApiClient {
     }
   }
 
-  private async handleResponse<T>(url: string, options: RequestInit, timeoutMs: number, retrying = false): Promise<T> {
+  private async handleResponse<T>(url: string, options: RequestInit, timeoutMs: number): Promise<T> {
     const response = await this.executeFetch(url, options, timeoutMs);
     const responseBody = await this.parseResponseBody<T>(response, url);
 
     if (!response.ok) {
-      if (response.status === 401 && !retrying) {
-        try {
-          // Attempt to refresh the token; cookie will be updated by the server
-          await this.post("auth/refresh", null);
-          // Retry the original request with the new cookie
-          const retryRes = await this.executeFetch(url, options, timeoutMs);
-          return this.parseResponseBody<T>(retryRes, url);
-        } catch (err) {
-          console.error("Refresh token failed", err);
-          throw new ApiError(401, "Unauthorized, please login again.", { err });
-        }
-      }
+      // No automatic refresh; backend handles HTTP-only refresh
       this.handleHttpError(response.status, responseBody);
     }
+
     return responseBody;
   }
 

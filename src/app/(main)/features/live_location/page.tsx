@@ -6,7 +6,6 @@ import L, { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import SocketService from "@/lib/hooks/socket-service";
 
-// Fix Leaflet marker icons
 const DefaultIcon = L.icon({
   iconUrl:
     "https://thumbs.dreamstime.com/z/live-location-pin-tracking-position-vector-illustration-stock-image-eps-277060574.jpg?ct=jpeg",
