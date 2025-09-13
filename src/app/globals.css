@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-html, body {
+html,
+body {
   overflow-x: hidden;
 }
 

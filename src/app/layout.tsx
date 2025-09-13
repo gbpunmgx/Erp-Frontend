@@ -1,31 +1,21 @@
 import { ReactNode } from "react";
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-
-import { ThemeProvider } from "next-themes";
-
-import { APP_CONFIG } from "@/config/app-config";
-
 import "./globals.css";
-import { ConfirmProvider } from "@/components/common/confirm-provider";
-import { Toaster } from "sonner";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: APP_CONFIG.meta.title,
-  description: APP_CONFIG.meta.description,
+  title: "The Code Vibes",
+  description: "My app description",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="light" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
-          <ConfirmProvider>{children}</ConfirmProvider>
-          <Toaster position="bottom-right" richColors />
-        </ThemeProvider>
+    <html lang="en" className="light">
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

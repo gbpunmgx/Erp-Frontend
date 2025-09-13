@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/core/store";
 
 type Entry = {
   accountCode: string;
@@ -10,7 +12,7 @@ type Entry = {
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<Entry[]>([{ accountCode: "", description: "", debit: 0, credit: 0 }]);
-
+  // const user = useSelector((state: RootState) => state.auth.user);
   const accounts = ["1000 - Cash", "2000 - Bank", "3000 - Sales", "4000 - Purchases", "5000 - Expenses"];
 
   // Add Row

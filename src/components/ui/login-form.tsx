@@ -6,16 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import authService from "@/app/login/services/auth-service";
+import authService, { LoginResponse } from "@/app/login/services/auth-service";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { setUser } from "@/core/store/slices/auth-slice";
 
 interface LoginFormProps extends React.ComponentProps<"form"> {}
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("superadmin");
+  const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +29,10 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     setError("");
 
     try {
-      const { authorities } = await authService.login(username, password);
-
-      console.log("Logged in user roles/permissions:", authorities);
-
-      window.location.href = "/dashboard";
+      const loginResponse: LoginResponse = await authService.login(username, password);
+      dispatch(setUser(loginResponse));
+      console.log(loginResponse);
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {
@@ -43,7 +48,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
           Enter your username below to login to your account
         </p>
       </div>
-
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <div className="grid gap-6">
@@ -59,7 +63,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
           />
         </div>
 
-        {/* Password Field */}
         <div className="grid gap-3">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>

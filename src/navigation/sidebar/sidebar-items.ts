@@ -1,4 +1,27 @@
-import { BookA, Home, LucideIcon, ReceiptText, ShoppingBag, Users } from "lucide-react";
+import {
+  BookA,
+  Building,
+  Building2,
+  Clock,
+  CreditCard,
+  Crown,
+  FileText,
+  Globe,
+  History,
+  Home,
+  LockOpen,
+  LucideIcon,
+  MapPin,
+  Package,
+  ReceiptText,
+  Settings,
+  Shield,
+  ShoppingBag,
+  ShoppingCart,
+  Tag,
+  UserCog,
+  Zap,
+} from "lucide-react";
 
 export interface NavSubItem {
   title: string;
@@ -42,36 +65,36 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Organizations",
         url: "/features/organization",
-        icon: Users,
+        icon: Building2,
         subItems: [
           {
             title: "Organizations Type",
             url: "/features/organization/businessType",
-            icon: Users,
+            icon: Building,
           },
           {
             title: "All Organizations",
             url: "/features/organization/all",
-            icon: Users,
+            icon: Globe,
           },
         ],
       },
       {
         title: "Purchase",
         url: "/purchase",
-        icon: Users,
+        icon: ShoppingCart,
         subItems: [
           {
             title: "Purchase Entry",
             url: "/purchase",
-            icon: Users,
+            icon: Package,
           },
         ],
       },
       {
         title: "Categories",
         url: "/features/category",
-        icon: BookA,
+        icon: Tag,
         subItems: [
           {
             title: "All Categories",
@@ -89,7 +112,7 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Voucher",
         url: "/features/voucher",
-        icon: ReceiptText,
+        icon: FileText,
         subItems: [
           {
             title: "Voucher",
@@ -107,54 +130,75 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Live Location",
         url: "/features/live_location",
-        icon: ReceiptText,
+        icon: MapPin,
         subItems: [
           {
             title: "Live Location",
             url: "/features/live_location",
-            icon: ReceiptText,
+            icon: MapPin,
           },
         ],
       },
     ],
   },
-
   {
     id: 5,
+    label: "Settings",
+    items: [
+      {
+        title: "Users",
+        url: "/features/users",
+        icon: UserCog,
+        subItems: [
+          {
+            title: "Access Control",
+            url: "/features/access_control",
+            icon: Shield,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 6,
     label: "Subscription Management",
     items: [
       {
         title: "Subscriptions",
         url: "/features/subscriptions",
-        icon: ReceiptText,
+        icon: CreditCard,
         subItems: [
           {
             title: "All Subscriptions",
             url: "/features/subscriptions/all",
-            icon: ReceiptText,
+            icon: CreditCard,
           },
           {
             title: "Active Plans",
             url: "/features/subscriptions/active",
+            icon: Zap,
           },
           {
             title: "Expired Plans",
             url: "/features/subscriptions/expired",
+            icon: Clock,
           },
           {
             title: "Pending Renewals",
             url: "/features/subscriptions/renewals",
+            icon: Settings,
           },
           {
             title: "Billing History",
             url: "/features/subscriptions/billing",
+            icon: History,
           },
         ],
       },
       {
         title: "Plans & Pricing",
         url: "/features/plans",
-        icon: ShoppingBag,
+        icon: Crown,
         subItems: [
           {
             title: "Subscription Plans",
@@ -164,14 +208,17 @@ export const sidebarItems: NavGroup[] = [
           {
             title: "Plan Features",
             url: "/features/plans/features",
+            icon: Zap,
           },
           {
             title: "Pricing Tiers",
             url: "/features/plans/pricing",
+            icon: Tag,
           },
           {
             title: "Custom Plans",
             url: "/features/plans/custom",
+            icon: Crown,
             comingSoon: true,
           },
         ],
