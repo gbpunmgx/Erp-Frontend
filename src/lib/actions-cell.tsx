@@ -21,6 +21,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Archive, Copy, Download, Edit, Eye, MessageCircle, MoreHorizontal, Share, Star, Trash2 } from "lucide-react";
 
+type ActionOptions<TData> = {
+  showInitial?: boolean;
+};
+
 type Props<TData> = {
   row: TData;
   onView?: (row: TData) => void;
@@ -38,7 +42,19 @@ type Props<TData> = {
     onClick: (row: TData) => void;
     variant?: "default" | "destructive";
     separator?: boolean;
+    showInitial?: boolean;
   }>;
+  actionOptions?: {
+    view?: ActionOptions<TData>;
+    edit?: ActionOptions<TData>;
+    delete?: ActionOptions<TData>;
+    copy?: ActionOptions<TData>;
+    download?: ActionOptions<TData>;
+    share?: ActionOptions<TData>;
+    archive?: ActionOptions<TData>;
+    favorite?: ActionOptions<TData>;
+    comment?: ActionOptions<TData>;
+  };
 };
 
 export function ActionsCell<TData>({
@@ -53,6 +69,7 @@ export function ActionsCell<TData>({
   onFavorite,
   onComment,
   customActions = [],
+  actionOptions = {},
 }: Props<TData>) {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
@@ -71,23 +88,6 @@ export function ActionsCell<TData>({
     ));
   }, [customActions, row]);
 
-  const hasPrimaryActions = onView ?? onEdit;
-  const hasDropdownActions =
-    onView ??
-    onEdit ??
-    onCopy ??
-    onDownload ??
-    onShare ??
-    onFavorite ??
-    onComment ??
-    onArchive ??
-    onDelete ??
-    customActions.length > 0;
-
-  if (!hasPrimaryActions && !hasDropdownActions) {
-    return null;
-  }
-
   const handleDelete = () => {
     if (onDelete) {
       onDelete(row);
@@ -95,111 +95,128 @@ export function ActionsCell<TData>({
     }
   };
 
-  const needsSeparator =
-    (onArchive ?? onDelete) &&
-    (onView ?? onEdit ?? onCopy ?? onDownload ?? onShare ?? onFavorite ?? onComment ?? customActions.length > 0);
-
   return (
     <>
       <div className="flex items-center gap-2">
-        {onView && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onView(row)}
-            className="hover:bg-accent/50 h-8 w-8 p-0 transition-all duration-300"
-            aria-label="View row"
-          >
+        {onView && actionOptions.view?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onView(row)} className="h-8 w-8 p-0">
             <Eye className="h-4 w-4" />
           </Button>
         )}
-        {onEdit && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(row)}
-            className="hover:bg-accent/50 h-8 w-8 p-0 transition-all duration-300"
-            aria-label="Edit row"
-          >
+        {onEdit && actionOptions.edit?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onEdit(row)} className="h-8 w-8 p-0">
             <Edit className="h-4 w-4" />
           </Button>
         )}
-        {hasDropdownActions && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="hover:bg-accent/50 h-8 w-8 p-0 transition-all duration-300"
-                aria-label="More actions"
-              >
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {onView && (
-                <DropdownMenuItem onClick={() => onView(row)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Details
-                </DropdownMenuItem>
-              )}
-              {onEdit && (
-                <DropdownMenuItem onClick={() => onEdit(row)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-              )}
-              {onCopy && (
-                <DropdownMenuItem onClick={() => onCopy(row)}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Duplicate
-                </DropdownMenuItem>
-              )}
-              {onDownload && (
-                <DropdownMenuItem onClick={() => onDownload(row)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </DropdownMenuItem>
-              )}
-              {onShare && (
-                <DropdownMenuItem onClick={() => onShare(row)}>
-                  <Share className="mr-2 h-4 w-4" />
-                  Share
-                </DropdownMenuItem>
-              )}
-              {onFavorite && (
-                <DropdownMenuItem onClick={() => onFavorite(row)}>
-                  <Star className="mr-2 h-4 w-4" />
-                  Add to Favorites
-                </DropdownMenuItem>
-              )}
-              {onComment && (
-                <DropdownMenuItem onClick={() => onComment(row)}>
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Add Comment
-                </DropdownMenuItem>
-              )}
-              {customActions.length > 0 && <>{renderedCustomActions}</>}
-              {needsSeparator && <DropdownMenuSeparator />}
-              {onArchive && (
-                <DropdownMenuItem onClick={() => onArchive(row)}>
-                  <Archive className="mr-2 h-4 w-4" />
-                  Archive
-                </DropdownMenuItem>
-              )}
-              {onDelete && (
-                <DropdownMenuItem
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {onCopy && actionOptions.copy?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onCopy(row)} className="h-8 w-8 p-0">
+            <Copy className="h-4 w-4" />
+          </Button>
         )}
+        {onDownload && actionOptions.download?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onDownload(row)} className="h-8 w-8 p-0">
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
+        {onShare && actionOptions.share?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onShare(row)} className="h-8 w-8 p-0">
+            <Share className="h-4 w-4" />
+          </Button>
+        )}
+        {onFavorite && actionOptions.favorite?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onFavorite(row)} className="h-8 w-8 p-0">
+            <Star className="h-4 w-4" />
+          </Button>
+        )}
+        {onComment && actionOptions.comment?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onComment(row)} className="h-8 w-8 p-0">
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        )}
+        {onArchive && actionOptions.archive?.showInitial && (
+          <Button variant="ghost" size="sm" onClick={() => onArchive(row)} className="h-8 w-8 p-0">
+            <Archive className="h-4 w-4" />
+          </Button>
+        )}
+        {onDelete && actionOptions.delete?.showInitial && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDeleteDialog(true)}
+            className="text-destructive h-8 w-8 p-0"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {onView && !actionOptions.view?.showInitial && (
+              <DropdownMenuItem onClick={() => onView(row)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View
+              </DropdownMenuItem>
+            )}
+            {onEdit && !actionOptions.edit?.showInitial && (
+              <DropdownMenuItem onClick={() => onEdit(row)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+            )}
+            {onCopy && !actionOptions.copy?.showInitial && (
+              <DropdownMenuItem onClick={() => onCopy(row)}>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicate
+              </DropdownMenuItem>
+            )}
+            {onDownload && !actionOptions.download?.showInitial && (
+              <DropdownMenuItem onClick={() => onDownload(row)}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </DropdownMenuItem>
+            )}
+            {onShare && !actionOptions.share?.showInitial && (
+              <DropdownMenuItem onClick={() => onShare(row)}>
+                <Share className="mr-2 h-4 w-4" />
+                Share
+              </DropdownMenuItem>
+            )}
+            {onFavorite && !actionOptions.favorite?.showInitial && (
+              <DropdownMenuItem onClick={() => onFavorite(row)}>
+                <Star className="mr-2 h-4 w-4" />
+                Favorite
+              </DropdownMenuItem>
+            )}
+            {onComment && !actionOptions.comment?.showInitial && (
+              <DropdownMenuItem onClick={() => onComment(row)}>
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Comment
+              </DropdownMenuItem>
+            )}
+            {onArchive && !actionOptions.archive?.showInitial && (
+              <DropdownMenuItem onClick={() => onArchive(row)}>
+                <Archive className="mr-2 h-4 w-4" />
+                Archive
+              </DropdownMenuItem>
+            )}
+            {customActions.length > 0 && renderedCustomActions}
+            {onDelete && !actionOptions.delete?.showInitial && (
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
