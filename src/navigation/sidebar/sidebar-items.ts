@@ -1,15 +1,19 @@
 import {
+  Banknote,
   BookA,
   BoxesIcon,
   Building,
   Building2,
+  CalendarCheck,
   Clock,
   CreditCard,
   Crown,
+  DatabaseIcon,
   FileText,
   Globe,
   History,
   Home,
+  IdCard,
   LockOpen,
   LucideIcon,
   MapPin,
@@ -17,10 +21,12 @@ import {
   ReceiptText,
   Settings,
   Shield,
+  ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Tag,
   UserCog,
+  Users,
   Zap,
 } from "lucide-react";
 
@@ -64,23 +70,6 @@ export const sidebarItems: NavGroup[] = [
     label: "Organization Management",
     items: [
       {
-        title: "Organizations",
-        url: "/features/organization",
-        icon: Building2,
-        subItems: [
-          {
-            title: "Organizations Type",
-            url: "/features/organization/businessType",
-            icon: Building,
-          },
-          {
-            title: "All Organizations",
-            url: "/features/organization/all",
-            icon: Globe,
-          },
-        ],
-      },
-      {
         title: "Purchase",
         url: "/purchase",
         icon: ShoppingCart,
@@ -89,18 +78,6 @@ export const sidebarItems: NavGroup[] = [
             title: "Purchase Entry",
             url: "/purchase",
             icon: Package,
-          },
-        ],
-      },
-      {
-        title: "Categories",
-        url: "/features/category",
-        icon: Tag,
-        subItems: [
-          {
-            title: "All Categories",
-            url: "/features/category",
-            icon: BookA,
           },
         ],
       },
@@ -196,12 +173,33 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Users",
         url: "/features/users",
-        icon: UserCog,
+        icon: Users,
         subItems: [
           {
             title: "Access Control",
             url: "/features/access_control",
-            icon: Shield,
+            icon: ShieldCheck,
+          },
+          {
+            title: "Employees",
+            url: "/features/employees",
+            icon: IdCard,
+          },
+          {
+            title: "Attendances",
+            url: "/features/attendances",
+            icon: CalendarCheck,
+          },
+          {
+            title: "Payrolls",
+            url: "/features/payrolls",
+            icon: Banknote,
+          },
+
+          {
+            title: "informations",
+            url: "/features/informations",
+            icon: DatabaseIcon,
           },
         ],
       },
