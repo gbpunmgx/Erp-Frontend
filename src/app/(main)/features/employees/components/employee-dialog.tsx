@@ -2,8 +2,8 @@
 
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Dialog,
   DialogContent,
@@ -43,39 +43,46 @@ import {
 } from "lucide-react";
 import { Employee } from "@/app/(main)/features/employees/types/employee";
 
-// ✅ Fixed Zod schema
-const employeeSchema = z.object({
-  firstName: z
+const employeeSchema = yup.object({
+  firstName: yup
     .string()
     .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters"),
-  lastName: z
+    .max(50, "First name must not exceed 50 characters")
+    .required("First name is required"),
+  lastName: yup
     .string()
     .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z
+    .max(50, "Last name must not exceed 50 characters")
+    .required("Last name is required"),
+  email: yup.string().email("Please enter a valid email address").required("Email is required"),
+  phone: yup
     .string()
     .min(10, "Phone number must be at least 10 characters")
-    .max(20, "Phone number must not exceed 20 characters"),
-  dateOfBirth: z.date({
-    required_error: "Date of birth is required",
-    invalid_type_error: "Please select a valid date",
-  }),
-  hireDate: z.date({
-    required_error: "Hire date is required",
-    invalid_type_error: "Please select a valid date",
-  }),
-  gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-    required_error: "Please select a gender",
-  }),
-  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
-    required_error: "Please select marital status",
-  }),
-  userId: z.number().nullable().optional(),
+    .max(20, "Phone number must not exceed 20 characters")
+    .required("Phone number is required"),
+  dateOfBirth: yup
+    .date()
+    .required("Date of birth is required")
+    .typeError("Please select a valid date")
+    .max(new Date(), "Date of birth cannot be in the future")
+    .min(new Date("1900-01-01"), "Date of birth is too far in the past"),
+  hireDate: yup
+    .date()
+    .required("Hire date is required")
+    .typeError("Please select a valid date")
+    .max(new Date(), "Hire date cannot be in the future"),
+  gender: yup
+    .string()
+    .oneOf(["MALE", "FEMALE", "OTHER"], "Please select a valid gender")
+    .required("Please select a gender"),
+  maritalStatus: yup
+    .string()
+    .oneOf(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], "Please select a valid marital status")
+    .required("Please select marital status"),
+  userId: yup.number().nullable().optional(),
 });
 
-type EmployeeFormData = z.infer<typeof employeeSchema>;
+type EmployeeFormData = yup.InferType<typeof employeeSchema>;
 
 interface EmployeeDialogProps {
   employee?: Employee | null;
@@ -97,7 +104,7 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
   loading = false,
 }) => {
   const form = useForm<EmployeeFormData>({
-    resolver: zodResolver(employeeSchema),
+    resolver: yupResolver(employeeSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
