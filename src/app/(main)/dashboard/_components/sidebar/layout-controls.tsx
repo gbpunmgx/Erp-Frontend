@@ -1,7 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
 import { Settings } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,14 +16,18 @@ type LayoutControlsProps = {
 };
 
 export function LayoutControls({ variant, collapsible, contentLayout }: LayoutControlsProps) {
+  const [isPending, startTransition] = useTransition();
+
   const handleValueChange = async (key: string, value: string) => {
-    await setValueToCookie(key, value);
+    startTransition(async () => {
+      await setValueToCookie(key, value);
+    });
   };
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button size="icon">
+        <Button size="icon" disabled={isPending}>
           <Settings />
         </Button>
       </PopoverTrigger>
@@ -44,6 +48,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={variant}
                 onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+                disabled={isPending}
               >
                 <ToggleGroupItem className="text-xs" value="inset" aria-label="Toggle inset">
                   Inset
@@ -66,6 +71,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={collapsible}
                 onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+                disabled={isPending}
               >
                 <ToggleGroupItem className="text-xs" value="icon" aria-label="Toggle icon">
                   Icon
@@ -85,6 +91,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={contentLayout}
                 onValueChange={(value) => handleValueChange("content_layout", value)}
+                disabled={isPending}
               >
                 <ToggleGroupItem className="text-xs" value="centered" aria-label="Toggle centered">
                   Centered

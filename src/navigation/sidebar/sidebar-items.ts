@@ -1,5 +1,6 @@
 import {
   BookA,
+  BoxesIcon,
   Building,
   Building2,
   Clock,
@@ -70,6 +71,53 @@ export const sidebarItems: NavGroup[] = [
           {
             title: "Organizations Type",
             url: "/features/organization/businessType",
+            icon: Building,
+          },
+          {
+            title: "All Organizations",
+            url: "/features/organization/all",
+            icon: Globe,
+          },
+        ],
+      },
+      {
+        title: "Purchase",
+        url: "/purchase",
+        icon: ShoppingCart,
+        subItems: [
+          {
+            title: "Purchase Entry",
+            url: "/purchase",
+            icon: Package,
+          },
+        ],
+      },
+      {
+        title: "Categories",
+        url: "/features/category",
+        icon: Tag,
+        subItems: [
+          {
+            title: "All Categories",
+            url: "/features/category",
+            icon: BookA,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    label: "Inventory Management",
+    items: [
+      {
+        title: "Product Management",
+        url: "/features/product",
+        icon: BoxesIcon,
+        subItems: [
+          {
+            title: "product",
+            url: "/features/product",
             icon: Building,
           },
           {

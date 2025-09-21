@@ -61,6 +61,7 @@ export default function OrganizationPage() {
           actionsConfig={{
             onEdit: handleEdit,
             onDelete: handleDelete,
+            onShare: handleDelete,
           }}
         />
       </Card>
