@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 
-// Shadcn UI components
 const Button = ({ children, className = "", ...props }) => (
   <button className={`rounded-md px-4 py-2 font-medium transition-colors ${className}`} {...props}>
     {children}
@@ -13,7 +12,6 @@ const Card = ({ children, className = "" }) => (
   <div className={`rounded-lg border bg-white shadow-sm ${className}`}>{children}</div>
 );
 
-// Move CircularProgress **outside** of AttendanceDashboard
 const CircularProgress = ({ hours, minutes, seconds }: { hours: number; minutes: number; seconds: number }) => {
   const totalMinutes = hours * 60 + minutes;
   const totalSeconds = totalMinutes * 60 + seconds;
@@ -62,10 +60,8 @@ const AttendanceDashboard = () => {
     seconds: 0,
   });
 
-  // Optional: breakTime can stay as static if unused
   const [breakTime] = useState({ hours: 0, minutes: 0, seconds: 55 });
 
-  // Always update current time
   useEffect(() => {
     const clock = setInterval(() => {
       setCurrentTime(new Date());
@@ -73,7 +69,6 @@ const AttendanceDashboard = () => {
     return () => clearInterval(clock);
   }, []);
 
-  // Update working time only if punched in
   useEffect(() => {
     if (!isPunchedIn) return;
 
