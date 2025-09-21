@@ -7,11 +7,11 @@ import { Download, Plus, Shield } from "lucide-react";
 import { Employee } from "@/app/(main)/features/employees/types/employee";
 import { Pagination } from "@/components/common";
 import EmployeeService from "@/app/(main)/features/employees/services/employee-service";
-import EmployeeCard from "@/app/(main)/features/employees/components /employee-card";
-import EmployeeFilters from "@/app/(main)/features/employees/components /employee-filters";
-import EmployeeList from "@/app/(main)/features/employees/components /employee-list";
+import EmployeeCard from "@/app/(main)/features/employees/components/employee-card";
+import EmployeeFilters from "@/app/(main)/features/employees/components/employee-filters";
+import EmployeeList from "@/app/(main)/features/employees/components/employee-list";
 import { toast } from "sonner";
-import EmployeeDialog from "@/app/(main)/features/employees/components /employee-dialog";
+import EmployeeDialog from "@/app/(main)/features/employees/components/employee-dialog";
 
 export default function EmployeeManagement() {
   const [employees, setEmployees] = useState<Employee[]>([]);
