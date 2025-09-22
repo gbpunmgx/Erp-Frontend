@@ -44,41 +44,14 @@ import {
 import { Employee } from "@/app/(main)/features/employees/types/employee";
 
 const employeeSchema = yup.object({
-  firstName: yup
-    .string()
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters")
-    .required("First name is required"),
-  lastName: yup
-    .string()
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters")
-    .required("Last name is required"),
-  email: yup.string().email("Please enter a valid email address").required("Email is required"),
-  phone: yup
-    .string()
-    .min(10, "Phone number must be at least 10 characters")
-    .max(20, "Phone number must not exceed 20 characters")
-    .required("Phone number is required"),
-  dateOfBirth: yup
-    .date()
-    .required("Date of birth is required")
-    .typeError("Please select a valid date")
-    .max(new Date(), "Date of birth cannot be in the future")
-    .min(new Date("1900-01-01"), "Date of birth is too far in the past"),
-  hireDate: yup
-    .date()
-    .required("Hire date is required")
-    .typeError("Please select a valid date")
-    .max(new Date(), "Hire date cannot be in the future"),
-  gender: yup
-    .string()
-    .oneOf(["MALE", "FEMALE", "OTHER"], "Please select a valid gender")
-    .required("Please select a gender"),
-  maritalStatus: yup
-    .string()
-    .oneOf(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], "Please select a valid marital status")
-    .required("Please select marital status"),
+  firstName: yup.string().min(2).max(50).required(),
+  lastName: yup.string().min(2).max(50).required(),
+  email: yup.string().email().required(),
+  phone: yup.string().min(10).max(20).required(),
+  dateOfBirth: yup.date().required().max(new Date()).min(new Date("1900-01-01")),
+  hireDate: yup.date().required().max(new Date()),
+  gender: yup.string().oneOf(["MALE", "FEMALE", "OTHER"]).required(),
+  maritalStatus: yup.string().oneOf(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).required(),
   userId: yup.number().nullable().optional(),
 });
 
@@ -121,32 +94,32 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
   });
 
   useEffect(() => {
-    if (open) {
-      if (employee && (mode === "update" || mode === "delete")) {
-        form.reset({
-          firstName: employee.firstName || "",
-          lastName: employee.lastName || "",
-          email: employee.email || "",
-          phone: employee.phone || "",
-          dateOfBirth: employee.dateOfBirth ? new Date(employee.dateOfBirth) : undefined,
-          hireDate: employee.hireDate ? new Date(employee.hireDate) : undefined,
-          gender: employee.gender,
-          maritalStatus: employee.maritalStatus,
-          userId: employee.userId,
-        });
-      } else if (mode === "create") {
-        form.reset({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          dateOfBirth: undefined,
-          hireDate: new Date(),
-          gender: undefined,
-          maritalStatus: undefined,
-          userId: null,
-        });
-      }
+    if (!open) return;
+
+    if (employee && (mode === "update" || mode === "delete")) {
+      form.reset({
+        firstName: employee.firstName ?? "",
+        lastName: employee.lastName ?? "",
+        email: employee.email ?? "",
+        phone: employee.phone ?? "",
+        dateOfBirth: employee.dateOfBirth ? new Date(employee.dateOfBirth) : undefined,
+        hireDate: employee.hireDate ? new Date(employee.hireDate) : undefined,
+        gender: employee.gender ?? undefined,
+        maritalStatus: employee.maritalStatus ?? undefined,
+        userId: employee.userId ?? null,
+      });
+    } else if (mode === "create") {
+      form.reset({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dateOfBirth: undefined,
+        hireDate: new Date(),
+        gender: undefined,
+        maritalStatus: undefined,
+        userId: null,
+      });
     }
   }, [employee, mode, form, open]);
 
@@ -155,8 +128,11 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
       const employeeData: Employee = {
         ...data,
         id: employee?.id,
-        dateOfBirth: data.dateOfBirth.toISOString().split("T")[0],
-        hireDate: data.hireDate.toISOString().split("T")[0],
+        dateOfBirth: data.dateOfBirth?.toISOString().split("T")[0] ?? "",
+        hireDate: data.hireDate?.toISOString().split("T")[0] ?? "",
+        userId: data.userId ?? null,
+        gender: data.gender ?? "OTHER",
+        maritalStatus: data.maritalStatus ?? "SINGLE",
       };
       await onSubmit(employeeData);
       onOpenChange(false);
@@ -221,10 +197,7 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
       <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              {getDialogIcon()}
-              Delete Employee
-            </AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">{getDialogIcon()} Delete Employee</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete{" "}
               <span className="font-semibold">
@@ -356,8 +329,7 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Heart className="h-4 w-4" />
-                        Marital Status *
+                        <Heart className="h-4 w-4" /> Marital Status *
                       </FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
@@ -400,8 +372,7 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
-                        Phone Number *
+                        <Phone className="h-4 w-4" /> Phone Number *
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Enter phone number" />
@@ -417,8 +388,7 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel className="flex items-center gap-2">
-                        <CalendarIconLucide className="h-4 w-4" />
-                        Hire Date *
+                        <CalendarIconLucide className="h-4 w-4" /> Hire Date *
                       </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -455,17 +425,13 @@ const EmployeeDialog: React.FC<EmployeeDialogProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        User ID (Optional)
+                        <Users className="h-4 w-4" /> User ID (Optional)
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           value={field.value ?? ""}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            field.onChange(val ? Number(val) : null);
-                          }}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                           placeholder="Enter user ID"
                         />
                       </FormControl>

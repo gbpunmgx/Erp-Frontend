@@ -23,6 +23,22 @@ export const ENDPOINTS = {
     DELETE: "employees/",
   },
 
+  FEATURE_ACTION: {
+    GET_ALL: "featureActions/all",
+    GET_BY_ID: "featureActions/",
+    CREATE: "featureActions/",
+    UPDATE: "featureActions/",
+    DELETE: "featureActions/",
+  },
+
+  ROLE: {
+    GET_ALL: "roles/all",
+    GET_BY_ID: "roles/",
+    CREATE: "roles/",
+    UPDATE: "roles/",
+    DELETE: "roles/",
+  },
+
   PAYROLL: {
     GET_ALL: "payrolls/all",
     GET_BY_ID: "payrolls/",

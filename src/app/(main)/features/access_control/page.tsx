@@ -35,7 +35,7 @@ const RoleManagementSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"roles" | "users" | "permissions">("roles");
 
   return (
-    <Card className="p-6">
+    <Card className="bg-gray-50 p-6 p-8 dark:bg-gray-900">
       <div>
         <h1 className="flex items-center gap-2 text-xl font-semibold">
           <Shield className="text-primary h-8 w-8" />

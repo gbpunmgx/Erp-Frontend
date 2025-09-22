@@ -1,18 +1,37 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode, ButtonHTMLAttributes } from "react";
 import { Calendar } from "lucide-react";
 
-const Button = ({ children, className = "", ...props }) => (
+// Button Component
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode;
+  className?: string;
+};
+
+const Button = ({ children, className = "", ...props }: ButtonProps) => (
   <button className={`rounded-md px-4 py-2 font-medium transition-colors ${className}`} {...props}>
     {children}
   </button>
 );
 
-const Card = ({ children, className = "" }) => (
+// Card Component
+type CardProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+const Card = ({ children, className = "" }: CardProps) => (
   <div className={`rounded-lg border bg-white shadow-sm ${className}`}>{children}</div>
 );
 
-const CircularProgress = ({ hours, minutes, seconds }: { hours: number; minutes: number; seconds: number }) => {
+// CircularProgress Component
+type CircularProgressProps = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
+const CircularProgress = ({ hours, minutes, seconds }: CircularProgressProps) => {
   const totalMinutes = hours * 60 + minutes;
   const totalSeconds = totalMinutes * 60 + seconds;
   const workDaySeconds = 8 * 60 * 60;
@@ -52,15 +71,19 @@ const CircularProgress = ({ hours, minutes, seconds }: { hours: number; minutes:
 };
 
 const AttendanceDashboard = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isPunchedIn, setIsPunchedIn] = useState(false);
-  const [workingTime, setWorkingTime] = useState({
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [isPunchedIn, setIsPunchedIn] = useState<boolean>(false);
+  const [workingTime, setWorkingTime] = useState<{ hours: number; minutes: number; seconds: number }>({
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
 
-  const [breakTime] = useState({ hours: 0, minutes: 0, seconds: 55 });
+  const [breakTime] = useState<{ hours: number; minutes: number; seconds: number }>({
+    hours: 0,
+    minutes: 0,
+    seconds: 55,
+  });
 
   useEffect(() => {
     const clock = setInterval(() => {
@@ -95,23 +118,18 @@ const AttendanceDashboard = () => {
     return () => clearInterval(workTimer);
   }, [isPunchedIn]);
 
-  // Calendar data for February 2023
   const daysInMonth = 28;
   const firstDayOfWeek = 3;
   const today = 2;
   const weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
   const generateCalendarDays = () => {
-    const days = [];
+    const days: { day: number; isCurrentMonth: boolean; isToday: boolean }[] = [];
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       days.push({ day: 31 - i, isCurrentMonth: false, isToday: false });
     }
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push({
-        day,
-        isCurrentMonth: true,
-        isToday: day === today,
-      });
+      days.push({ day, isCurrentMonth: true, isToday: day === today });
     }
     const remainingCells = 42 - days.length;
     for (let day = 1; day <= remainingCells; day++) {
@@ -221,7 +239,6 @@ const AttendanceDashboard = () => {
               <Button
                 onClick={() => {
                   if (isPunchedIn) {
-                    // Reset timer when punching out
                     setWorkingTime({ hours: 0, minutes: 0, seconds: 0 });
                   }
                   setIsPunchedIn(!isPunchedIn);
