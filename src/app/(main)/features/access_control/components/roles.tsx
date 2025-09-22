@@ -1,34 +1,25 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Shield, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Role } from "@/app/(main)/features/access_control/types/role";
+import { Role, Permission } from "@/app/(main)/features/access_control/types/role";
 import RoleService from "@/app/(main)/features/access_control/services/role-service";
 import RoleForm from "@/app/(main)/features/access_control/components/role-form";
 import RoleCard from "@/app/(main)/features/access_control/components/role-card";
 
-const RolesTab: React.FC = () => {
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
+interface RolesTabProps {
+  initialRoles: Role[];
+  initialPermissions: Permission[];
+}
+
+const RolesTab: React.FC<RolesTabProps> = ({ initialRoles, initialPermissions }) => {
+  const [roles, setRoles] = useState<Role[]>(initialRoles);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [creatingRole, setCreatingRole] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const res = await RoleService.getAll();
-        setRoles(res);
-      } catch (error) {
-        console.error("Failed to fetch roles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRoles().then((r) => {});
-  }, []);
 
   const filteredRoles = useMemo(() => {
     return roles.filter((role) => role.name.toLowerCase().includes(roleSearchTerm.toLowerCase()));
@@ -63,14 +54,6 @@ const RolesTab: React.FC = () => {
       console.error("Failed to submit role:", error);
     }
   };
-
-  if (loading) {
-    return (
-      <TabsContent value="roles" className="p-12 text-center">
-        <p>Loading roles...</p>
-      </TabsContent>
-    );
-  }
 
   return (
     <TabsContent value="roles" className="space-y-6">
@@ -114,6 +97,7 @@ const RolesTab: React.FC = () => {
             setEditingRole(null);
           }}
           initialData={editingRole ?? undefined}
+          permission={initialPermissions}
         />
       )}
 
@@ -129,8 +113,8 @@ const RolesTab: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredRoles.map((role, index) => (
-                <RoleCard key={`${role.id}-${index}`} role={role} onEdit={handleEditRole} onDelete={handleDeleteRole} />
+              {filteredRoles.map((role) => (
+                <RoleCard key={role.id} role={role} onEdit={handleEditRole} onDelete={handleDeleteRole} />
               ))}
             </div>
           )}

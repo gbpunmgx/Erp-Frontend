@@ -1,41 +1,76 @@
 "use client";
-import React, { useState } from "react";
-import { Settings, Shield, Users } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+import React, { useEffect, useState } from "react";
+import { Shield, Users } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import PermissionsTab from "@/app/(main)/features/access_control/components/permission";
-import UsersTab, { User } from "@/app/(main)/features/access_control/components/users";
+
+import UsersTab from "@/app/(main)/features/access_control/components/users";
 import RolesTab from "@/app/(main)/features/access_control/components/roles";
 
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    avatar: "",
-    roles: [
-      { id: "r1", name: "Admin", color: "#3b82f6" },
-      { id: "r2", name: "Editor", color: "#22c55e" },
-    ],
-    status: "active",
-    lastActive: "2025-09-13",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    avatar: "",
-    roles: [{ id: "r3", name: "Viewer", color: "#f59e0b" }],
-    status: "pending",
-    lastActive: "2025-09-10",
-  },
-];
+import type { User } from "@/app/(main)/features/access_control/types/user";
+import type { Permission, Role } from "@/app/(main)/features/access_control/types/role";
+
+import UserService from "@/app/(main)/features/access_control/services/user-service";
+import RoleService from "@/app/(main)/features/access_control/services/role-service";
+import FeatureActionService from "@/app/(main)/features/access_control/services/feature-action-service";
 
 const RoleManagementSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"roles" | "users" | "permissions">("roles");
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await UserService.getAll();
+        setUsers(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch users:", err);
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const data = await RoleService.getAll();
+        setRoles(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch roles:", err);
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const data = await FeatureActionService.getAll();
+        setPermissions(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch permissions:", err);
+      } finally {
+        setPermissionsLoading(false);
+      }
+    };
+    fetchPermissions();
+  }, []);
+
   return (
-    <Card className="bg-gray-50 p-6 p-8 dark:bg-gray-900">
+    <Card className="bg-gray-50 p-6">
       <div>
         <h1 className="flex items-center gap-2 text-xl font-semibold">
           <Shield className="text-primary h-8 w-8" />
@@ -45,31 +80,29 @@ const RoleManagementSystem: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="roles" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Roles
+            <Shield className="h-4 w-4" /> Roles
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Users
-          </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Permissions
+            <Users className="h-4 w-4" /> Users
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="roles">
-          <RolesTab />
+          {(rolesLoading ?? permissionsLoading) ? (
+            <p className="text-muted-foreground text-sm">Loading roles & permissions...</p>
+          ) : (
+            <RolesTab initialRoles={roles} initialPermissions={permissions} />
+          )}
         </TabsContent>
 
         <TabsContent value="users">
-          <UsersTab users={mockUsers} />
-        </TabsContent>
-
-        <TabsContent value="permissions">
-          <PermissionsTab />
+          {usersLoading ? (
+            <p className="text-muted-foreground text-sm">Loading users...</p>
+          ) : (
+            <UsersTab users={users} />
+          )}
         </TabsContent>
       </Tabs>
     </Card>
