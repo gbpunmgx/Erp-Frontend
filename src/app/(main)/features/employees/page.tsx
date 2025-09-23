@@ -99,18 +99,6 @@ export default function EmployeeManagement() {
     setDialogOpen(true);
   };
 
-  const openUpdateDialog = (employee: Employee) => {
-    setSelectedEmployeeForDialog(employee);
-    setDialogMode("update");
-    setDialogOpen(true);
-  };
-
-  const openDeleteDialog = (employee: Employee) => {
-    setSelectedEmployeeForDialog(employee);
-    setDialogMode("delete");
-    setDialogOpen(true);
-  };
-
   const handleDialogSubmit = async (employeeData: Employee) => {
     setDialogLoading(true);
     try {

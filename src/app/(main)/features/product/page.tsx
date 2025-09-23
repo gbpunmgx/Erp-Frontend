@@ -5,47 +5,31 @@ import { Package, Layers, Tag, Award, Ruler, Barcode } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BarcodeManagement from "@/app/(main)/features/product/components/barcode"; // Import the separate component
 import BatchManagement from "@/app/(main)/features/product/components/batch";
-// Mock data for categories
+
 const mockCategories = [
   { id: 1, name: "Electronics", description: "Gadgets and devices" },
   { id: 2, name: "Clothing", description: "Apparel and accessories" },
 ];
 
-// Mock data for brands
 const mockBrands = [
   { id: 1, name: "TechTrend", logo: "techtrend.png" },
   { id: 2, name: "FashionPeak", logo: "fashionpeak.png" },
 ];
 
-// Mock data for units
 const mockUnits = [
   { id: 1, name: "Piece", abbreviation: "pc" },
   { id: 2, name: "Kilogram", abbreviation: "kg" },
 ];
 
-// Placeholder component for Products tab
 const ProductsTab: React.FC = () => {
   return (
     <div>
       <h2 className="text-lg font-semibold">Products</h2>
       <p className="text-muted-foreground">Manage your product catalog here.</p>
-      {/* Add product list or form here */}
     </div>
   );
 };
 
-// Placeholder component for Batches tab
-// const BatchesTab: React.FC = () => {
-//   return (
-//     <div>
-//       <h2 className="text-lg font-semibold">Batches</h2>
-//       <p className="text-muted-foreground">Manage product batches here.</p>
-//       {/* Add batch list or form here */}
-//     </div>
-//   );
-// };
-
-// Placeholder component for Categories tab
 const CategoriesTab: React.FC<{ categories: { id: number; name: string; description: string }[] }> = ({
   categories,
 }) => {
@@ -64,7 +48,6 @@ const CategoriesTab: React.FC<{ categories: { id: number; name: string; descript
   );
 };
 
-// Placeholder component for Brands tab
 const BrandsTab: React.FC<{ brands: { id: number; name: string; logo: string }[] }> = ({ brands }) => {
   return (
     <div>
@@ -81,7 +64,6 @@ const BrandsTab: React.FC<{ brands: { id: number; name: string; logo: string }[]
   );
 };
 
-// Placeholder component for Units tab
 const UnitsTab: React.FC<{ units: { id: number; name: string; abbreviation: string }[] }> = ({ units }) => {
   return (
     <div>
@@ -119,7 +101,7 @@ const ProductManagement: React.FC = () => {
             Products
           </TabsTrigger>
           <TabsTrigger value="barcodes" className="flex items-center gap-2">
-            <Barcode className="h-4 w-4" /> {/* You'll need to import Barcode from lucide-react here too */}
+            <Barcode className="h-4 w-4" />
             Barcodes
           </TabsTrigger>
           <TabsTrigger value="batches" className="flex items-center gap-2">

@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { GenericReport, ColumnDef, FormProps } from "@/components/ui/report-layout";
+import { GenericReport } from "@/components/common/GenericReport/generic-report";
+import { ColumnDef } from "@/components/common/GenericReport/types";
+import { FormProps } from "@/components/common/GenericReport/generic-form";
 
 // Generate mock batches data
 const generateMockBatches = (): Array<{

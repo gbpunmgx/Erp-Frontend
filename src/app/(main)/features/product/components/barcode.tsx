@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GenericReport, ColumnDef, FormProps } from "@/components/ui/report-layout";
+import { GenericReport } from "@/components/common/GenericReport/generic-report";
+import { ColumnDef } from "@/components/common/GenericReport/types";
+import { FormProps } from "@/components/common/GenericReport/generic-form";
 
 // Generate mock barcodes
 const generateMockBarcodes = (): Array<{

@@ -70,7 +70,7 @@ const RoleManagementSystem: React.FC = () => {
   }, []);
 
   return (
-    <Card className="bg-gray-50 p-6">
+    <Card className="p-6">
       <div>
         <h1 className="flex items-center gap-2 text-xl font-semibold">
           <Shield className="text-primary h-8 w-8" />

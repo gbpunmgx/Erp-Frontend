@@ -17,7 +17,7 @@ class EmployeeService {
 
   async getById(id: number): Promise<Employee> {
     try {
-      const res = await this.api.get<{ data: Employee; message: string }>(`${ENDPOINTS.EMPLOYEE.GET_BY_ID}/${id}`);
+      const res = await this.api.get<{ data: Employee; message: string }>(`${ENDPOINTS.EMPLOYEE.GET_BY_ID}${id}`);
       return res.data;
     } catch (error) {
       throw this.handleError(error, `Failed to fetch employee with ID ${id}.`);
@@ -36,7 +36,7 @@ class EmployeeService {
   async update(id: number, employee: Employee): Promise<Employee> {
     try {
       const res = await this.api.put<{ data: Employee; message: string }>(
-        `${ENDPOINTS.EMPLOYEE.UPDATE}/${id}`,
+        `${ENDPOINTS.EMPLOYEE.UPDATE}${id}`,
         employee,
       );
       return res.data;
@@ -47,7 +47,7 @@ class EmployeeService {
 
   async delete(id: number): Promise<void> {
     try {
-      await this.api.delete(`${ENDPOINTS.EMPLOYEE.DELETE}/${id}`);
+      await this.api.delete(`${ENDPOINTS.EMPLOYEE.DELETE}${id}`);
     } catch (error) {
       throw this.handleError(error, `Failed to delete employee with ID ${id}.`);
     }
