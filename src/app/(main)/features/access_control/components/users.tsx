@@ -30,25 +30,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { userColumns } from "@/app/(main)/features/access_control/columns/user-columns";
 import { User } from "@/app/(main)/features/access_control/types/user";
 import UserService from "@/app/(main)/features/access_control/services/user-service";
-
-export interface Role {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  name: string;
-  description: string | null;
-  organizationId: number;
-  featureActionIds: number[];
-  authUserIds: number[];
-}
+import { Role } from "@/app/(main)/features/access_control/types/role";
 
 interface UsersTableProps {
   users: User[];
   roles: Role[];
+  onUpdateUser: (updatedUser: User) => void; // callback to parent
 }
 
-export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) {
-  const [users, setUsers] = React.useState<User[]>(initialUsers); // <-- local state
+export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -88,7 +78,7 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
     const userToUpdate = users.find((u) => u.id === selectedUser);
     if (!userToUpdate) return;
 
-    const updatedUser = {
+    const updatedUser: User = {
       ...userToUpdate,
       roleId: selectedRole,
       updatedAt: new Date().toISOString(),
@@ -96,8 +86,8 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
 
     try {
       await UserService.update(selectedUser, updatedUser);
-      // Update local state
-      setUsers((prev) => prev.map((u) => (u.id === selectedUser ? updatedUser : u)));
+      // Pass updated user to parent
+      onUpdateUser(updatedUser);
       setDialogOpen(false);
     } catch (error) {
       console.error("Failed to assign role:", error);
@@ -108,7 +98,6 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
     <div className="w-full">
       {/* Search and column toggles */}
       <div className="flex items-center gap-4 py-4">
-        {/* Column search input */}
         <Input
           placeholder={`Search ${searchColumn ?? "column"}...`}
           value={searchTerm}
@@ -116,7 +105,6 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
           className="max-w-sm"
         />
 
-        {/* Select column to search */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -135,7 +123,6 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Toggle visible columns */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -159,7 +146,6 @@ export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) 
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Assign Role Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>Assign Role</Button>

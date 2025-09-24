@@ -6,17 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Plus, Search, Shield, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Role, Permission } from "@/app/(main)/features/access_control/types/role";
-import RoleService from "@/app/(main)/features/access_control/services/role-service";
 import RoleForm from "@/app/(main)/features/access_control/components/role-form";
 import RoleCard from "@/app/(main)/features/access_control/components/role-card";
 
 interface RolesTabProps {
-  initialRoles: Role[];
-  initialPermissions: Permission[];
+  roles: Role[];
+  permissions: Permission[];
+  onEditRole: (role: Role) => void;
+  onDeleteRole: (roleId: number) => void;
+  onSubmitRole: (roleData: Omit<Role, "id" | "createdAt" | "updatedAt">, roleId?: number) => void;
 }
 
-const RolesTab: React.FC<RolesTabProps> = ({ initialRoles, initialPermissions }) => {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
+const RolesTab: React.FC<RolesTabProps> = ({ roles, permissions, onEditRole, onDeleteRole, onSubmitRole }) => {
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [creatingRole, setCreatingRole] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -25,34 +26,21 @@ const RolesTab: React.FC<RolesTabProps> = ({ initialRoles, initialPermissions })
     return roles.filter((role) => role.name.toLowerCase().includes(roleSearchTerm.toLowerCase()));
   }, [roles, roleSearchTerm]);
 
-  const handleEditRole = (role: Role) => {
+  const handleEditClick = (role: Role) => {
     setEditingRole(role);
     setCreatingRole(true);
+    onEditRole(role);
   };
 
-  const handleDeleteRole = async (roleId: number) => {
-    try {
-      await RoleService.delete(roleId);
-      setRoles((prev) => prev.filter((role) => role.id !== roleId));
-    } catch (error) {
-      console.error("Failed to delete role:", error);
-    }
+  const handleCancel = () => {
+    setCreatingRole(false);
+    setEditingRole(null);
   };
 
-  const handleSubmitRole = async (roleData: Omit<Role, "id" | "createdAt" | "updatedAt">, roleId?: number) => {
-    try {
-      if (roleId) {
-        const updatedRole = await RoleService.update(roleId, roleData);
-        setRoles((prev) => prev.map((r) => (r.id === roleId ? updatedRole : r)));
-      } else {
-        const newRole = await RoleService.create(roleData);
-        setRoles((prev) => [...prev, newRole]);
-      }
-      setCreatingRole(false);
-      setEditingRole(null);
-    } catch (error) {
-      console.error("Failed to submit role:", error);
-    }
+  const handleSubmit = (roleData: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
+    onSubmitRole(roleData, editingRole?.id);
+    setCreatingRole(false);
+    setEditingRole(null);
   };
 
   return (
@@ -91,13 +79,10 @@ const RolesTab: React.FC<RolesTabProps> = ({ initialRoles, initialPermissions })
 
       {creatingRole && (
         <RoleForm
-          onSubmit={handleSubmitRole}
-          onCancel={() => {
-            setCreatingRole(false);
-            setEditingRole(null);
-          }}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
           initialData={editingRole ?? undefined}
-          permission={initialPermissions}
+          permission={permissions}
         />
       )}
 
@@ -114,7 +99,7 @@ const RolesTab: React.FC<RolesTabProps> = ({ initialRoles, initialPermissions })
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredRoles.map((role) => (
-                <RoleCard key={role.id} role={role} onEdit={handleEditRole} onDelete={handleDeleteRole} />
+                <RoleCard key={role.id} role={role} onEdit={handleEditClick} onDelete={onDeleteRole} />
               ))}
             </div>
           )}
