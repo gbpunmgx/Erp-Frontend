@@ -5,7 +5,6 @@ import { Shield, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 
-import UsersTab from "@/app/(main)/features/access_control/components/users";
 import RolesTab from "@/app/(main)/features/access_control/components/roles";
 
 import type { User } from "@/app/(main)/features/access_control/types/user";
@@ -14,6 +13,7 @@ import type { Permission, Role } from "@/app/(main)/features/access_control/type
 import UserService from "@/app/(main)/features/access_control/services/user-service";
 import RoleService from "@/app/(main)/features/access_control/services/role-service";
 import FeatureActionService from "@/app/(main)/features/access_control/services/feature-action-service";
+import { UsersTableDemo } from "@/app/(main)/features/access_control/components/users";
 
 const RoleManagementSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"roles" | "users" | "permissions">("roles");
@@ -101,7 +101,7 @@ const RoleManagementSystem: React.FC = () => {
           {usersLoading ? (
             <p className="text-muted-foreground text-sm">Loading users...</p>
           ) : (
-            <UsersTab users={users} />
+            <UsersTableDemo users={users} roles={roles} />
           )}
         </TabsContent>
       </Tabs>

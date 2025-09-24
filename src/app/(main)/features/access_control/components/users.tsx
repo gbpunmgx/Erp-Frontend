@@ -1,236 +1,267 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, UserRoundCog, ChevronUp, ChevronDown } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import * as React from "react";
+import {
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table";
+import { ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import InfoCard from "@/components/common/info-card";
-import { ActionsCell } from "@/lib/actions-cell";
-import { Pagination } from "@/components/common";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export interface User {
+import { userColumns } from "@/app/(main)/features/access_control/columns/user-columns";
+import { User } from "@/app/(main)/features/access_control/types/user";
+import UserService from "@/app/(main)/features/access_control/services/user-service";
+
+export interface Role {
   id: number;
-  username: string;
-  email: string;
-  avatar?: string;
-  roles: { id: number; name: string; color: string }[];
-  status: "active" | "inactive" | "pending" | boolean;
-  lastActive: string;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  description: string | null;
+  organizationId: number;
+  featureActionIds: number[];
+  authUserIds: number[];
 }
 
-interface UsersTabProps {
+interface UsersTableProps {
   users: User[];
+  roles: Role[];
 }
 
-type SortKey = "username" | "status" | "lastActive" | null;
-type SortOrder = "asc" | "desc";
+export function UsersTableDemo({ users: initialUsers, roles }: UsersTableProps) {
+  const [users, setUsers] = React.useState<User[]>(initialUsers); // <-- local state
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [searchColumn, setSearchColumn] = React.useState<string | null>("username");
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<number | null>(null);
+  const [selectedRole, setSelectedRole] = React.useState<number | null>(null);
 
-const UsersTab: React.FC<UsersTabProps> = ({ users }) => {
-  const [userSearchTerm, setUserSearchTerm] = useState("");
-  const [userStatusFilter, setUserStatusFilter] = useState<"all" | "active" | "inactive" | "pending">("all");
+  const table = useReactTable({
+    data: users,
+    columns: userColumns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
 
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  React.useEffect(() => {
+    table.getColumn(searchColumn ?? "")?.setFilterValue(searchTerm);
+  }, [searchTerm, searchColumn]);
 
-  const [sortKey, setSortKey] = useState<SortKey>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const handleAssignRole = async () => {
+    if (!selectedUser || !selectedRole) return;
 
-  // Filter users based on search and status
-  const filteredUsers = useMemo(() => {
-    return (users || []).filter((user) => {
-      const matchesSearch = user.username.toLowerCase().includes(userSearchTerm.toLowerCase());
-      const normalizedStatus = typeof user.status === "boolean" ? (user.status ? "active" : "inactive") : user.status;
-      const matchesStatus = userStatusFilter === "all" || normalizedStatus === userStatusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [users, userSearchTerm, userStatusFilter]);
+    const userToUpdate = users.find((u) => u.id === selectedUser);
+    if (!userToUpdate) return;
 
-  // Sort users based on selected column
-  const sortedUsers = useMemo(() => {
-    if (!sortKey) return filteredUsers;
-    return [...filteredUsers].sort((a, b) => {
-      let aValue: string | number = "";
-      let bValue: string | number = "";
+    const updatedUser = {
+      ...userToUpdate,
+      roleId: selectedRole,
+      updatedAt: new Date().toISOString(),
+    };
 
-      if (sortKey === "username") {
-        aValue = a.username.toLowerCase();
-        bValue = b.username.toLowerCase();
-      } else if (sortKey === "status") {
-        aValue = typeof a.status === "boolean" ? (a.status ? "active" : "inactive") : a.status;
-        bValue = typeof b.status === "boolean" ? (b.status ? "active" : "inactive") : b.status;
-      } else if (sortKey === "lastActive") {
-        aValue = new Date(a.lastActive).getTime();
-        bValue = new Date(b.lastActive).getTime();
-      }
-
-      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-  }, [filteredUsers, sortKey, sortOrder]);
-
-  const paginatedUsers = useMemo(() => {
-    const start = pageIndex * pageSize;
-    return sortedUsers.slice(start, start + pageSize);
-  }, [sortedUsers, pageIndex, pageSize]);
-
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
+    try {
+      await UserService.update(selectedUser, updatedUser);
+      // Update local state
+      setUsers((prev) => prev.map((u) => (u.id === selectedUser ? updatedUser : u)));
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to assign role:", error);
     }
   };
 
-  const renderSortIcon = (key: SortKey) => {
-    if (sortKey !== key) return null;
-    return sortOrder === "asc" ? (
-      <ChevronUp className="ml-1 inline h-3 w-3" />
-    ) : (
-      <ChevronDown className="ml-1 inline h-3 w-3" />
-    );
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h2 className="text-xl font-semibold">Users</h2>
-        <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row">
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              placeholder="Search users..."
-              value={userSearchTerm}
-              onChange={(e) => setUserSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+    <div className="w-full">
+      {/* Search and column toggles */}
+      <div className="flex items-center gap-4 py-4">
+        {/* Column search input */}
+        <Input
+          placeholder={`Search ${searchColumn ?? "column"}...`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm"
+        />
 
-          <Select value={userStatusFilter} onValueChange={(value) => setUserStatusFilter(value as any)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Select column to search */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              Column: {searchColumn ?? "Select"} <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((col) => col.getCanFilter?.())
+              .map((col) => (
+                <DropdownMenuItem key={col.id} onClick={() => setSearchColumn(col.id)} className="capitalize">
+                  {col.id}
+                </DropdownMenuItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add User
+        {/* Toggle visible columns */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Assign Role Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>Assign Role</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Assign Role</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <Select
+                value={selectedUser?.toString() ?? ""}
+                onValueChange={(val) => setSelectedUser(Number(val))}
+                className="w-full"
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select User" />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.username}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={selectedRole?.toString() ?? ""}
+                onValueChange={(val) => setSelectedRole(Number(val))}
+                className="w-full"
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleAssignRole}>Assign</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={userColumns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-sm">
+          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+          selected.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            Next
           </Button>
         </div>
       </div>
-
-      {filteredUsers.length === 0 ? (
-        <InfoCard
-          title="No users found"
-          message="Try adjusting your search terms or filters."
-          icon={<UserRoundCog className="mx-auto mb-4 h-12 w-12" />}
-        />
-      ) : (
-        <Card className="p-6">
-          <Table className="min-w-full">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[250px] cursor-pointer" onClick={() => handleSort("username")}>
-                  User {renderSortIcon("username")}
-                </TableHead>
-                <TableHead className="w-[250px]">Roles</TableHead>
-                <TableHead className="w-[120px] cursor-pointer" onClick={() => handleSort("status")}>
-                  Status {renderSortIcon("status")}
-                </TableHead>
-                <TableHead className="w-[150px] cursor-pointer" onClick={() => handleSort("lastActive")}>
-                  Last Active {renderSortIcon("lastActive")}
-                </TableHead>
-                <TableHead className="w-[80px] text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedUsers.map((user) => {
-                const normalizedStatus =
-                  typeof user.status === "boolean" ? (user.status ? "active" : "inactive") : user.status;
-                return (
-                  <TableRow key={user.id} className="hover:bg-gray-50">
-                    {/* User Info */}
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={user.avatar} />
-                          <AvatarFallback>
-                            {user.username
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{user.username}</span>
-                          <span className="text-muted-foreground truncate text-sm">{user.email}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    {/* Roles */}
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles?.map((role) => (
-                          <Badge
-                            key={role.id}
-                            variant="outline"
-                            className="px-2 py-0.5 text-sm text-white"
-                            style={{ backgroundColor: role.color }}
-                          >
-                            {role.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant={normalizedStatus === "active" ? "default" : "destructive"} className="capitalize">
-                        {normalizedStatus}
-                      </Badge>
-                    </TableCell>
-
-                    {/* Last Active */}
-                    <TableCell className="text-muted-foreground text-sm">{user.lastActive}</TableCell>
-
-                    {/* Actions */}
-                    <TableCell className="text-right">
-                      <ActionsCell
-                        row={user}
-                        onEdit={() => console.log(user.id)}
-                        onDelete={() => console.log(user.id)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-
-          <Pagination
-            totalItems={filteredUsers.length}
-            pageIndex={pageIndex}
-            setPageIndex={setPageIndex}
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            dataSize={`${filteredUsers.length} items`}
-          />
-        </Card>
-      )}
     </div>
   );
-};
-
-export default UsersTab;
+}
