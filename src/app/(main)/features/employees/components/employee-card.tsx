@@ -14,12 +14,7 @@ interface EmployeeCardProps {
   generateAvatarUrl: (name: string) => string;
 }
 
-export default function EmployeeCard({
-  employee,
-  formatDate,
-  openEmployeeDetails,
-  generateAvatarUrl,
-}: EmployeeCardProps) {
+export default function EmployeeCard({ employee, formatDate, generateAvatarUrl }: EmployeeCardProps) {
   return (
     <Card className="group relative transition-shadow duration-200 hover:shadow-lg">
       <div className="absolute top-4 right-4 z-10">
