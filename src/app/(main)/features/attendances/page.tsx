@@ -6,7 +6,11 @@ import { Employee } from "../employees/types/employee";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import AttendanceDashboard from "./attendance-list/page"; // import your dashboard
+import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Calendar, Search } from "lucide-react";
+import AttendanceDashboard from "../attendances/attendance-list/page";
 
 const employeesData: (Employee & { attendance: string[]; leaveDays: string })[] = [
   {
@@ -45,16 +49,24 @@ const months = [
   { value: "01", label: "January" },
   { value: "02", label: "February" },
   { value: "03", label: "March" },
-  // ...add remaining months
+  { value: "04", label: "April" },
+  { value: "05", label: "May" },
+  { value: "06", label: "June" },
+  { value: "07", label: "July" },
+  { value: "08", label: "August" },
+  { value: "09", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
 ];
 
 export default function AttendancePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("01");
   const [selectedYear, setSelectedYear] = useState("2024");
-  const [open, setOpen] = useState(false); // dialog state
+  const [open, setOpen] = useState(false);
 
-  const { open: isSidebarOpen } = useSidebar(); // <-- get sidebar open state
+  const { open: isSidebarOpen } = useSidebar();
 
   const isWeekend = (day: number, month: string, year: string) => {
     const date = new Date(Number(year), Number(month) - 1, day);
@@ -66,11 +78,12 @@ export default function AttendancePage() {
 
   return (
     <div
-      className="overflow-x-auto p-2 transition-all duration-300 sm:p-4 md:p-6"
-      style={{ maxWidth: isSidebarOpen ? "calc(100% - 16rem)" : "96%" }}
+      className="overflow-x-auto p-4 transition-all duration-300"
+      style={{ maxWidth: !isSidebarOpen ? "calc(100% - 16rem)" : "100%" }}
     >
-      {/* Top bar with Add New */}
-      <div className="mb-4 flex justify-end">
+      {/* Top Bar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Attendance</h1>
         <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => setOpen(true)}>
           Do your Attendance
         </Button>
@@ -93,7 +106,7 @@ export default function AttendancePage() {
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="h-[90vh] max-w-5xl overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Attendance Dashboard</DialogTitle>
           </DialogHeader>
