@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Save, X } from "lucide-react";
+import { Save, Shield, X } from "lucide-react";
 import { Permission, Role } from "@/app/(main)/features/access_control/types/role";
 import PermissionSelector from "./permission-selector";
 
@@ -71,7 +71,7 @@ export default function RoleForm({ initialData, onSubmit, onCancel, permission }
 
       <div className="flex justify-end gap-3 pt-4">
         <Button onClick={onCancel} className="flex items-center gap-2">
-          <X className="h-4 w-4" />
+          <Shield className="h-4 w-4" />
           Cancel
         </Button>
         <Button onClick={handleSubmit} disabled={!isFormValid} className="flex items-center gap-2">

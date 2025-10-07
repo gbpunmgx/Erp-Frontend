@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Plus, Shield } from "lucide-react";
 import { Employee } from "@/app/(main)/features/employees/types/employee";
@@ -16,13 +16,13 @@ import { useEmployees } from "@/lib/hooks/api_data/use-employees";
 
 export default function EmployeeManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee] = useState<Employee | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(viewMode === "grid" ? 8 : 10);
   const [activeTab, setActiveTab] = useState<"employee" | "leave">("employee");
   const [showFormPage, setShowFormPage] = useState(false);
-  const [formMode, setFormMode] = useState<"create" | "update">("create");
+  const [formMode] = useState<"create" | "update">("create");
   const { employees, loading } = useEmployees();
 
   const filteredEmployees = useMemo(() => {
@@ -40,18 +40,6 @@ export default function EmployeeManagement() {
     const startIndex = pageIndex * pageSize;
     return filteredEmployees.slice(startIndex, startIndex + pageSize);
   }, [filteredEmployees, pageIndex, pageSize]);
-
-  const openCreateForm = () => {
-    setSelectedEmployee(null);
-    setFormMode("create");
-    setShowFormPage(true);
-  };
-
-  const openEditForm = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setFormMode("update");
-    setShowFormPage(true);
-  };
 
   const handleFormSubmit = async (employeeData: Employee) => {
     try {
@@ -84,7 +72,6 @@ export default function EmployeeManagement() {
   return (
     <Card className="min-h-screen w-full p-4 md:p-8">
       <div className="w-full space-y-6">
-        {/* Header */}
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h1 className="flex items-center gap-2 text-xl font-semibold">

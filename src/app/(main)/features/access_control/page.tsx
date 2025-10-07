@@ -1,78 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Shield, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 
 import RolesTab from "@/app/(main)/features/access_control/components/roles";
 import { UsersTableDemo } from "@/app/(main)/features/access_control/components/users";
-
-import type { User } from "@/app/(main)/features/access_control/types/user";
-import type { Permission, Role } from "@/app/(main)/features/access_control/types/role";
+import type { Role } from "@/app/(main)/features/access_control/types/role";
 
 import UserService from "@/app/(main)/features/access_control/services/user-service";
 import RoleService from "@/app/(main)/features/access_control/services/role-service";
-import FeatureActionService from "@/app/(main)/features/access_control/services/feature-action-service";
 import { toast } from "sonner";
+import { useUsers } from "@/lib/hooks/api_data/use-users";
+import { useRoles } from "@/lib/hooks/api_data/use-roles";
+import { usePermissions } from "@/lib/hooks/api_data/use-permissions";
 
 const RoleManagementSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"roles" | "users">("roles");
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [usersLoading, setUsersLoading] = useState(true);
-
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [rolesLoading, setRolesLoading] = useState(true);
-
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [permissionsLoading, setPermissionsLoading] = useState(true);
-
-  const fetchUsers = async () => {
-    setUsersLoading(true);
-    try {
-      const data = await UserService.getAll();
-      setUsers(data);
-    } catch (err) {
-      toast.error("Failed to fetch users. Please try again.");
-    } finally {
-      setUsersLoading(false);
-    }
-  };
-
-  const fetchRoles = async () => {
-    setRolesLoading(true);
-    try {
-      const data = await RoleService.getAll();
-      setRoles(data);
-    } catch (err) {
-      toast.error("Failed to fetch roles. Please try again.");
-    } finally {
-      setRolesLoading(false);
-    }
-  };
-
-  const fetchPermissions = async () => {
-    setPermissionsLoading(true);
-    try {
-      const data = await FeatureActionService.getAll();
-      setPermissions(data);
-    } catch (err) {
-      toast.error("Failed to fetch permissions. Please try again.");
-    } finally {
-      setPermissionsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers().then((r) => {});
-    fetchRoles().then((r) => {});
-    fetchPermissions().then((r) => {});
-  }, []);
-
-  const handleEditRole = (role: Role) => {
-    toast("Edit role feature coming soon!");
-  };
+  const { users, loading } = useUsers();
+  const { roles, loading: rolesLoading, fetch: fetchRoles, setRoles } = useRoles();
+  const { permissions, loading: permissionsLoading, fetch: fetchPermissions } = usePermissions();
 
   const handleDeleteRole = async (roleId: number) => {
     try {
@@ -113,7 +61,6 @@ const RoleManagementSystem: React.FC = () => {
 
       await UserService.update(userId, updatedUser);
       toast.success("Role assigned successfully.");
-      await fetchUsers();
       await fetchRoles();
       await fetchPermissions();
     } catch (err) {
@@ -148,7 +95,6 @@ const RoleManagementSystem: React.FC = () => {
             <RolesTab
               roles={roles}
               permissions={permissions}
-              onEditRole={handleEditRole}
               onDeleteRole={handleDeleteRole}
               onSubmitRole={handleSubmitRole}
             />
@@ -156,7 +102,7 @@ const RoleManagementSystem: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="users">
-          {usersLoading ? (
+          {loading ? (
             <p className="text-muted-foreground text-sm">Loading users...</p>
           ) : (
             <UsersTableDemo

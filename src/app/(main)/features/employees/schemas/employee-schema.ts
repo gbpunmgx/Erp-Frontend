@@ -2,19 +2,31 @@ import * as yup from "yup";
 
 export const employeeSchema = yup.object({
   firstName: yup.string().required("First name is required"),
+  middleName: yup.string().optional(),
   lastName: yup.string().required("Last name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phone: yup.string().required("Phone is required"),
-  dateOfBirth: yup.date().required("Date of birth is required"),
-  gender: yup.string().required("Gender is required"),
-  maritalStatus: yup.string().required("Marital status is required"),
+  dateOfBirth: yup
+    .string()
+    .required("Date of birth is required")
+    .matches(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  hireDate: yup
+    .string()
+    .required("Hire date is required")
+    .matches(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  gender: yup.string().oneOf(["MALE", "FEMALE", "OTHER"]).required("Gender is required"),
+  maritalStatus: yup
+    .string()
+    .oneOf(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"])
+    .required("Marital status is required"),
+  status: yup.boolean().required("Status is required"),
 });
 
 export const userSchema = yup.object({
   username: yup.string().required("Username required"),
-  email: yup.string().email("Invalid email").required("Email required"),
   password: yup.string().min(6, "Password must be at least 6 characters").required("Password required"),
   roleId: yup.number().required("Role required"),
+  status: yup.boolean().required("Status is required"),
 });
 
 export const combinedSchema = yup.object({
@@ -22,12 +34,12 @@ export const combinedSchema = yup.object({
   isUser: yup.boolean(),
   user: yup.object().when("isUser", {
     is: true,
-    then: () => userSchema,
+    then: () => userSchema.required(),
     otherwise: () => yup.object().optional(),
   }),
 });
 
-export type FormData = yup.InferType<typeof combinedSchema>;
+export type EmployeeFormData = yup.InferType<typeof combinedSchema>;
 
 import { Briefcase, Code, Crown, Users } from "lucide-react";
 

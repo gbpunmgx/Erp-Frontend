@@ -12,12 +12,11 @@ import RoleCard from "@/app/(main)/features/access_control/components/role-card"
 interface RolesTabProps {
   roles: Role[];
   permissions: Permission[];
-  onEditRole: (role: Role) => void;
   onDeleteRole: (roleId: number) => void;
   onSubmitRole: (roleData: Omit<Role, "id" | "createdAt" | "updatedAt">, roleId?: number) => void;
 }
 
-const RolesTab: React.FC<RolesTabProps> = ({ roles, permissions, onEditRole, onDeleteRole, onSubmitRole }) => {
+const RolesTab: React.FC<RolesTabProps> = ({ roles, permissions, onDeleteRole, onSubmitRole }) => {
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [creatingRole, setCreatingRole] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -29,7 +28,6 @@ const RolesTab: React.FC<RolesTabProps> = ({ roles, permissions, onEditRole, onD
   const handleEditClick = (role: Role) => {
     setEditingRole(role);
     setCreatingRole(true);
-    onEditRole(role);
   };
 
   const handleCancel = () => {
@@ -66,7 +64,7 @@ const RolesTab: React.FC<RolesTabProps> = ({ roles, permissions, onEditRole, onD
           >
             {creatingRole ? (
               <>
-                <X className="mr-2 h-4 w-4" /> Close
+                <Shield className="mr-2 h-4 w-4" /> Close
               </>
             ) : (
               <>
