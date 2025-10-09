@@ -21,8 +21,8 @@ export default function EmployeeCard({ employee, formatDate, generateAvatarUrl }
         <ActionsCell<Employee>
           row={employee}
           onView={(e) => console.log(e.firstName)}
-          onEdit={(e) => console.log(e.userId)}
-          onDelete={(e) => console.log(e.userId)}
+          onEdit={(e) => console.log(e.firstName)}
+          onDelete={(e) => console.log(e.firstName)}
         />
       </div>
       <CardContent className="p-6 text-center">

@@ -44,10 +44,10 @@ export default function EmployeeManagement() {
   const handleFormSubmit = async (employeeData: Employee) => {
     try {
       if (formMode === "create") {
-        const newEmployee = await EmployeeService.create(employeeData);
+        await EmployeeService.create(employeeData);
         toast.success("Employee created successfully!");
       } else if (formMode === "update" && employeeData.id) {
-        const updatedEmployee = await EmployeeService.update(employeeData.id, employeeData);
+        await EmployeeService.update(employeeData.id, employeeData);
         toast.success("Employee updated successfully!");
       }
     } catch {
