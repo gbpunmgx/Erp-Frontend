@@ -1,24 +1,85 @@
 import * as yup from "yup";
+import { Employee } from "@/app/(main)/features/employees/types/employee";
+import { User } from "@/app/(main)/features/access_control/types/user";
+import { parse, isValid } from "date-fns";
 
-export const userSchema = yup.object().shape({
-  name: yup.string().min(2, "Name must be at least 2 characters").required("Name is required"),
-  email: yup.string().email("Invalid email address").required("Email is required"),
-  age: yup
-    .number()
-    .min(18, "Must be at least 18 years old")
-    .max(120, "Invalid age")
-    .required("Age is required")
-    .typeError("Age must be a number"),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[0-9]/, "Password must contain at least one number")
-    .required("Password is required"),
+export interface EmployeeFormValues extends Omit<Employee, "id" | "createdAt" | "updatedAt"> {
+  isUser: boolean; // extra form-only field
+  user?: User & { confirmPassword?: string }; // add confirmPassword for form
+}
+
+export const initialValues: EmployeeFormValues = {
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  dateOfBirth: "",
+  hireDate: "",
+  gender: "MALE",
+  maritalStatus: "SINGLE",
+  status: true,
+  isUser: false,
+  user: {
+    username: "",
+    password: "",
+    confirmPassword: "",
+    roleId: 0,
+    status: true,
+  },
+};
+
+export const userSchema = yup.object({
+  username: yup.string().required("Username required"),
+  password: yup.string().min(6, "Password must be at least 6 characters").required("Password required"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords don't match")
-    .required("Please confirm your password"),
-  website: yup.string().url("Invalid URL").notRequired(),
-  role: yup.string().required("Role is required"),
+    .required("Confirm password required")
+    .test("passwords-match", "Passwords must match", function (value) {
+      return value === this.parent.password;
+    }),
+  roleId: yup.number().required("Role required"),
+  status: yup.boolean().required("Status is required"),
+});
+
+export const employeeSchema = yup.object({
+  firstName: yup.string().required("First name required"),
+  middleName: yup.string().optional(),
+  lastName: yup.string().required("Last name required"),
+  email: yup.string().email("Invalid email").required("Email required"),
+  phone: yup.string().required("Phone required"),
+
+  dateOfBirth: yup
+    .string()
+    .required("Date of birth required")
+    .test("valid-date", "Invalid date", (value) => {
+      if (!value) return false; // empty value fails
+      const parsed = parse(value, "yyyy-MM-dd", new Date());
+      return isValid(parsed) && value.length === 10;
+    }),
+
+  hireDate: yup
+    .string()
+    .required("Hire date required")
+    .test("valid-date", "Invalid date", (value) => {
+      if (!value) return false;
+      const parsed = parse(value, "yyyy-MM-dd", new Date());
+      return isValid(parsed) && value.length === 10;
+    }),
+
+  gender: yup.mixed().oneOf(["MALE", "FEMALE", "OTHER"]).required("Gender required"),
+
+  maritalStatus: yup.mixed().oneOf(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).required("Marital status required"),
+
+  status: yup.boolean().required("Status required"),
+});
+
+export const combinedSchema = yup.object({
+  ...employeeSchema.fields,
+  isUser: yup.boolean(),
+  user: yup.object().when("isUser", {
+    is: true,
+    then: (schema) => userSchema.required("User details are required"),
+    otherwise: (schema) => yup.object().optional(),
+  }),
 });

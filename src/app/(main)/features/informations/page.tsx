@@ -1,174 +1,117 @@
 "use client";
 
-import React, { useState } from "react";
-import { FormField } from "@/components/common/form-field";
-import { DropdownField } from "@/components/common/dropdown-field";
-import * as yup from "yup";
-import { FormErrors, UserFormData } from "@/app/(main)/features/informations/types";
-import { userSchema } from "@/app/(main)/features/informations/user-schema";
+import { Formik, Form } from "formik";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SelectItem } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
+import { combinedSchema, EmployeeFormValues, initialValues } from "./user-schema";
+import { FormInput } from "@/components/common/form-input";
+import { FormSelect } from "@/components/common/form-select";
+import { FormCheckbox } from "@/components/common/form-checkbox";
+import { FormDatePicker } from "@/components/common/form-date-picker";
 
-export default function ValidationForm() {
-  const [formData, setFormData] = useState<UserFormData>({
-    name: "",
-    email: "",
-    age: "",
-    password: "",
-    confirmPassword: "",
-    website: "",
-    role: "",
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? (value ? Number(value) : "") : value,
-    }));
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(false);
-
-    try {
-      await userSchema.validate(formData, { abortEarly: false });
-      setErrors({});
-      setSubmitted(true);
-      console.log("Form data:", formData);
-
-      setFormData({
-        name: "",
-        email: "",
-        age: "",
-        password: "",
-        confirmPassword: "",
-        website: "",
-        role: "",
-      });
-    } catch (error) {
-      if (error instanceof yup.ValidationError) {
-        const newErrors: FormErrors = {};
-        error.inner.forEach((err) => {
-          if (err.path) newErrors[err.path as keyof FormErrors] = err.message;
-        });
-        setErrors(newErrors);
-      }
-    }
-  };
-
-  const ageOptions = Array.from({ length: 100 }, (_, i) => ({
-    label: (i + 1).toString(),
-    value: (i + 1).toString(),
-  }));
-
-  const roleOptions = [
-    { label: "Admin", value: "admin" },
-    { label: "Manager", value: "manager" },
-    { label: "User", value: "user" },
-  ];
-
+export default function EmployeeFormPage() {
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-2xl font-bold text-gray-800">User Registration Form</h1>
+    <div className="m-0 min-h-screen w-full p-0">
+      <div className="w-full">
+        <div className="space-y-2 py-8 text-center">
+          <h1 className="text-2xl font-bold">Create Employee</h1>
+          <p className="text-muted-foreground">Add a new team member</p>
+        </div>
 
-        {submitted && (
-          <div className="mb-4 rounded border border-green-400 bg-green-100 p-4 text-green-700">
-            Form submitted successfully!
-          </div>
-        )}
+        <Formik
+          initialValues={initialValues}
+          validationSchema={combinedSchema}
+          onSubmit={(values: EmployeeFormValues, { setSubmitting }) => {
+            console.log("Form Submitted:", values);
+            setTimeout(() => {
+              alert(JSON.stringify(values, null, 2));
+              setSubmitting(false);
+            }, 500);
+          }}
+        >
+          {({ values, isSubmitting }) => (
+            <Form className="w-full space-y-8">
+              <Alert className="w-full">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="flex w-full items-center justify-between">
+                  <span className="font-bold">Enable system access for this employee</span>
+                  <FormCheckbox name="isUser" label="System User Access" />
+                </AlertDescription>
+              </Alert>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField<UserFormData>
-            label="Name"
-            id="name"
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            error={errors.name}
-            required
-          />
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle>Personal Information</CardTitle>
+                  <CardDescription>Employee details and contact info</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <FormInput name="firstName" label="First Name" placeholder="Enter first name" />
+                    <FormInput name="middleName" label="Middle Name" placeholder="Enter middle name" />
+                    <FormInput name="lastName" label="Last Name" placeholder="Enter last name" />
+                    <FormInput name="email" label="Email" placeholder="employee@company.com" type="email" />
+                    <FormInput name="phone" label="Phone" placeholder="+1 (555) 000-0000" />
+                    <FormDatePicker name="dateOfBirth" label="Date of Birth" placeholder="YYYY-MM-DD" />
+                    <FormDatePicker name="hireDate" label="Hire Date" placeholder="YYYY-MM-DD" />
+                    <FormSelect name="gender" label="Gender" placeholder="Select gender">
+                      <SelectItem value="MALE">Male</SelectItem>
+                      <SelectItem value="FEMALE">Female</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </FormSelect>
+                    <FormSelect name="maritalStatus" label="Marital Status" placeholder="Select status">
+                      <SelectItem value="SINGLE">Single</SelectItem>
+                      <SelectItem value="MARRIED">Married</SelectItem>
+                      <SelectItem value="DIVORCED">Divorced</SelectItem>
+                      <SelectItem value="WIDOWED">Widowed</SelectItem>
+                    </FormSelect>
+                    <div className="flex items-center pt-8">
+                      <FormCheckbox name="status" label="Active Employee" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <FormField<UserFormData>
-            label="Email"
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-            required
-          />
+              {values.isUser && values.user && (
+                <Card className="w-full">
+                  <CardHeader>
+                    <CardTitle>System Access</CardTitle>
+                    <CardDescription>Configure login credentials</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormInput name="user.username" label="Username" placeholder="Enter username" />
+                      <FormInput name="user.password" type="password" label="Password" placeholder="Enter password" />
 
-          <DropdownField<UserFormData>
-            label="Age"
-            id="age"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            options={ageOptions}
-            error={errors.age}
-            required
-          />
+                      <FormInput
+                        name="user.confirmPassword"
+                        type="password"
+                        label="Confirm Password"
+                        placeholder="Enter password"
+                      />
+                      <FormSelect name="user.roleId" label="Role" placeholder="Select role">
+                        <SelectItem value={"1"}>Admin</SelectItem>
+                        <SelectItem value={"2"}>User</SelectItem>
+                        <SelectItem value={"3"}>Guest</SelectItem>
+                      </FormSelect>
+                      <div className="flex items-center pt-8">
+                        <FormCheckbox name="user.status" label="Account Active" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-          <FormField<UserFormData>
-            label="Password"
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            error={errors.password}
-            required
-          />
-
-          <FormField<UserFormData>
-            label="Age"
-            id="age"
-            name="age"
-            type="text"
-            value={formData.age}
-            onChange={handleChange}
-            error={errors.age}
-            required
-          />
-
-          <FormField<UserFormData>
-            label="Website (Optional)"
-            id="website"
-            name="website"
-            type="text"
-            value={formData.website ?? ""}
-            onChange={handleChange}
-            error={errors.website}
-            placeholder="https://example.com"
-          />
-          <DropdownField<UserFormData>
-            label="User Role"
-            id="role"
-            name="role"
-            value={formData.role ?? ""}
-            onChange={handleChange}
-            options={roleOptions}
-            error={errors.role}
-            required
-            allowUnselect={true}
-          />
-
-          <button
-            type="submit"
-            className="w-full rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
-          >
-            Submit
-          </button>
-        </form>
+              <div className="flex w-full justify-end space-x-4 pt-6">
+                <Button type="submit" size="lg" className="min-w-[150px]" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : "Save Employee"}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );
