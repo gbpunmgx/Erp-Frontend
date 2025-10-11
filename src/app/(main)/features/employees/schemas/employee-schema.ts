@@ -3,12 +3,13 @@ import { Employee } from "@/app/(main)/features/employees/types/employee";
 import { User } from "@/app/(main)/features/access_control/types/user";
 import { parse, isValid } from "date-fns";
 
-export interface EmployeeFormValues extends Omit<Employee, "id" | "createdAt" | "updatedAt"> {
+export interface EmployeeFormValues extends Omit<Employee, "createdAt" | "updatedAt"> {
   isUser: boolean;
   user?: User & { confirmPassword?: string };
 }
 
 export const initialValues: EmployeeFormValues = {
+  id: undefined,
   firstName: "",
   middleName: "",
   lastName: "",
@@ -43,6 +44,7 @@ export const userSchema = yup.object({
 });
 
 export const employeeSchema = yup.object({
+  id: yup.number().optional(),
   firstName: yup.string().required("First name required"),
   middleName: yup.string().optional(),
   lastName: yup.string().required("Last name required"),
@@ -79,7 +81,7 @@ export const combinedSchema = yup.object({
   isUser: yup.boolean(),
   user: yup.object().when("isUser", {
     is: true,
-    then: (schema) => userSchema.required("User details are required"),
-    otherwise: (schema) => yup.object().optional(),
+    then: () => userSchema.required("User details are required"),
+    otherwise: () => yup.object().optional(),
   }),
 });

@@ -15,7 +15,7 @@ export const useRoles = (): {
   const fetchRoles = async () => {
     setLoading(true);
     try {
-      const data = await RoleService.getAll(); // Ensure RoleService.getAll returns Promise<Role[]>
+      const data = await RoleService.getAll();
       setRoles(data);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch roles";

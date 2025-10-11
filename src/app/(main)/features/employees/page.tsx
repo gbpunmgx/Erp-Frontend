@@ -13,17 +13,20 @@ import { toast } from "sonner";
 import EmployeeForm from "@/app/(main)/features/employees/components/employee-form";
 import { Card } from "@/components/ui/card";
 import { useEmployees } from "@/lib/hooks/api_data/use-employees";
+import { useRoles } from "@/lib/hooks/api_data/use-roles";
 
 export default function EmployeeManagement() {
+  const { employees, loading } = useEmployees();
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(viewMode === "grid" ? 8 : 10);
   const [activeTab, setActiveTab] = useState<"employee" | "leave">("employee");
   const [showFormPage, setShowFormPage] = useState(false);
-  const [formMode] = useState<"create" | "update">("create");
-  const { employees, loading } = useEmployees();
+  const [formMode, setFormMode] = useState<"create" | "update">("create");
+  const { roles } = useRoles();
 
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) return employees;
@@ -46,14 +49,21 @@ export default function EmployeeManagement() {
       if (formMode === "create") {
         await EmployeeService.create(employeeData);
         toast.success("Employee created successfully!");
-      } else if (formMode === "update" && employeeData.id) {
-        await EmployeeService.update(employeeData.id, employeeData);
-        toast.success("Employee updated successfully!");
+      } else {
+        if (typeof employeeData.id === "number") {
+          await EmployeeService.update(employeeData.id, employeeData);
+          toast.success("Employee updated successfully!");
+        } else {
+          toast.error("Employee ID is missing. Cannot update employee.");
+          return;
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to save employee:", error);
       toast.error("Failed to save employee. Please try again.");
     } finally {
       setShowFormPage(false);
+      setSelectedEmployee(null);
     }
   };
 
@@ -72,6 +82,7 @@ export default function EmployeeManagement() {
   return (
     <Card className="min-h-screen w-full p-4 md:p-8">
       <div className="w-full space-y-6">
+        {/* Header */}
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h1 className="flex items-center gap-2 text-xl font-semibold">
@@ -82,23 +93,44 @@ export default function EmployeeManagement() {
               Manage employees, their information, and access control
             </p>
           </div>
+
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="outline">
               <Download className="mr-1 h-4 w-4" /> Export
             </Button>
-            <Button onClick={() => setShowFormPage((prev) => !prev)}>
-              {showFormPage ? (
-                <>
-                  <Shield className="mr-1 h-4 w-4" /> Cancel
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-1 h-4 w-4" /> Add Employee
-                </>
-              )}
-            </Button>
+            {!showFormPage ? (
+              <Button
+                onClick={() => {
+                  setSelectedEmployee(null);
+                  setFormMode("create");
+                  setShowFormPage(true);
+                }}
+              >
+                <Plus className="mr-1 h-4 w-4" /> Add Employee
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  setSelectedEmployee(null);
+                  setShowFormPage(false);
+                }}
+              >
+                <Shield className="mr-1 h-4 w-4" /> Cancel
+              </Button>
+            )}
           </div>
         </div>
+
+        {showFormPage && (
+          <div className="w-full">
+            <EmployeeForm
+              defaultValues={selectedEmployee ?? undefined}
+              onSubmit={handleFormSubmit}
+              loading={false}
+              roles={roles}
+            />
+          </div>
+        )}
 
         {!showFormPage && (
           <>
@@ -120,6 +152,11 @@ export default function EmployeeManagement() {
                     employee={emp}
                     formatDate={formatDate}
                     generateAvatarUrl={generateAvatarUrl}
+                    onEdit={() => {
+                      setSelectedEmployee(emp);
+                      setFormMode("update");
+                      setShowFormPage(true);
+                    }}
                   />
                 ))}
               </div>
@@ -147,12 +184,6 @@ export default function EmployeeManagement() {
               />
             )}
           </>
-        )}
-
-        {showFormPage && (
-          <div className="w-full">
-            <EmployeeForm defaultValues={selectedEmployee ?? undefined} onSubmit={handleFormSubmit} loading={false} />
-          </div>
         )}
       </div>
     </Card>

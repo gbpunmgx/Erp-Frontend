@@ -17,8 +17,8 @@ interface EmployeeListProps {
   pageSize: number;
   setPageSize: (size: number) => void;
   formatDate: (dateString: string) => string;
-  openEmployeeDetails: (employee: Employee) => void;
   generateAvatarUrl: (name: string) => string;
+  openEmployeeForm: (employee: Employee) => void;
   sortField: keyof Employee | null;
   sortOrder: "asc" | "desc" | null;
   setSort: (field: keyof Employee) => void;
@@ -32,8 +32,8 @@ export default function EmployeeList({
   pageSize,
   setPageSize,
   formatDate,
-  openEmployeeDetails,
   generateAvatarUrl,
+  openEmployeeForm,
   sortField,
   sortOrder,
   setSort,
@@ -66,7 +66,7 @@ export default function EmployeeList({
           </TableHeader>
           <TableBody>
             {employees.map((employee) => (
-              <TableRow key={employee.userId}>
+              <TableRow key={employee.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
@@ -87,11 +87,11 @@ export default function EmployeeList({
                 <TableCell>{employee.email}</TableCell>
                 <TableCell>{formatDate(employee.hireDate)}</TableCell>
                 <TableCell>
-                  <ActionsCell
+                  <ActionsCell<Employee>
                     row={employee}
-                    onView={() => openEmployeeDetails(employee)}
-                    onEdit={(e) => console.log(e.userId)}
-                    onDelete={(e) => console.log(e.userId)}
+                    onView={() => console.log("View", employee.id)}
+                    onEdit={() => openEmployeeForm(employee)}
+                    onDelete={() => console.log("Delete", employee.id)}
                   />
                 </TableCell>
               </TableRow>
