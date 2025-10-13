@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import { ChevronRight } from "lucide-react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -38,13 +37,20 @@ const NavItemExpanded = ({
   item,
   isActive,
   isSubmenuOpen,
+  index,
 }: {
   item: NavMainItem;
   isActive: (url: string, subItems?: NavMainItem["subItems"]) => boolean;
   isSubmenuOpen: (subItems?: NavMainItem["subItems"]) => boolean;
+  index: number;
 }) => {
   return (
-    <Collapsible key={item.title} asChild defaultOpen={isSubmenuOpen(item.subItems)} className="group/collapsible">
+    <Collapsible
+      key={`${item.title}-${item.url}-${index}`}
+      asChild
+      defaultOpen={isSubmenuOpen(item.subItems)}
+      className="group/collapsible"
+    >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           {item.subItems ? (
@@ -76,8 +82,8 @@ const NavItemExpanded = ({
         {item.subItems && (
           <CollapsibleContent className="mt-2 space-y-3">
             <SidebarMenuSub>
-              {item.subItems.map((subItem) => (
-                <SidebarMenuSubItem key={subItem.title}>
+              {item.subItems.map((subItem, subIndex) => (
+                <SidebarMenuSubItem key={`${subItem.title}-${subItem.url}-${subIndex}`}>
                   <SidebarMenuSubButton aria-disabled={subItem.comingSoon} isActive={isActive(subItem.url)} asChild>
                     <Link href={subItem.url} target={subItem.newTab ? "_blank" : undefined}>
                       {subItem.icon && <subItem.icon />}
@@ -98,12 +104,14 @@ const NavItemExpanded = ({
 const NavItemCollapsed = ({
   item,
   isActive,
+  index,
 }: {
   item: NavMainItem;
   isActive: (url: string, subItems?: NavMainItem["subItems"]) => boolean;
+  index: number;
 }) => {
   return (
-    <SidebarMenuItem key={item.title}>
+    <SidebarMenuItem key={`${item.title}-${item.url}-${index}`}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <SidebarMenuButton
@@ -119,10 +127,9 @@ const NavItemCollapsed = ({
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-50 space-y-1" side="right" align="start">
-          {item.subItems?.map((subItem) => (
-            <DropdownMenuItem key={subItem.title} asChild>
+          {item.subItems?.map((subItem, subIndex) => (
+            <DropdownMenuItem key={`${subItem.title}-${subItem.url}-${subIndex}`} asChild>
               <SidebarMenuSubButton
-                key={subItem.title}
                 asChild
                 className="focus-visible:ring-0"
                 aria-disabled={subItem.comingSoon}
@@ -159,16 +166,27 @@ export function NavMain({ items }: NavMainProps) {
 
   return (
     <>
-      {items.map((group) => (
-        <SidebarGroup key={group.id}>
+      {items.map((group, groupIndex) => (
+        <SidebarGroup key={`${group.id}-${groupIndex}`}>
           {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
           <SidebarGroupContent className="flex flex-col gap-18">
             <SidebarMenu>
-              {group.items.map((item) =>
+              {group.items.map((item, itemIndex) =>
                 state === "collapsed" && !isMobile ? (
-                  <NavItemCollapsed key={item.title} item={item} isActive={isItemActive} />
+                  <NavItemCollapsed
+                    key={`${item.title}-${item.url}-${itemIndex}`}
+                    item={item}
+                    isActive={isItemActive}
+                    index={itemIndex}
+                  />
                 ) : (
-                  <NavItemExpanded key={item.title} item={item} isActive={isItemActive} isSubmenuOpen={isSubmenuOpen} />
+                  <NavItemExpanded
+                    key={`${item.title}-${item.url}-${itemIndex}`}
+                    item={item}
+                    isActive={isItemActive}
+                    isSubmenuOpen={isSubmenuOpen}
+                    index={itemIndex}
+                  />
                 ),
               )}
             </SidebarMenu>

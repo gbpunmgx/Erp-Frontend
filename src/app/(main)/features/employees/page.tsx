@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Plus, Shield } from "lucide-react";
 import { Employee } from "@/app/(main)/features/employees/types/employee";
@@ -16,8 +16,10 @@ import { useEmployees } from "@/lib/hooks/api_data/use-employees";
 import { useRoles } from "@/lib/hooks/api_data/use-roles";
 
 export default function EmployeeManagement() {
-  const { employees, loading } = useEmployees();
+  const { employees: initialEmployees, loading } = useEmployees();
+  const { roles } = useRoles();
 
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -26,7 +28,15 @@ export default function EmployeeManagement() {
   const [activeTab, setActiveTab] = useState<"employee" | "leave">("employee");
   const [showFormPage, setShowFormPage] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "update">("create");
-  const { roles } = useRoles();
+  const [formLoading, setFormLoading] = useState(false);
+
+  useEffect(() => {
+    setEmployees(initialEmployees);
+  }, [initialEmployees]);
+
+  useEffect(() => {
+    setPageSize(viewMode === "grid" ? 8 : 10);
+  }, [viewMode]);
 
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) return employees;
@@ -46,24 +56,29 @@ export default function EmployeeManagement() {
 
   const handleFormSubmit = async (employeeData: Employee) => {
     try {
+      setFormLoading(true);
+      let result: Employee;
       if (formMode === "create") {
-        await EmployeeService.create(employeeData);
+        result = await EmployeeService.create(employeeData);
+        setEmployees((prev) => [...prev, result]);
         toast.success("Employee created successfully!");
       } else {
         if (typeof employeeData.id === "number") {
-          await EmployeeService.update(employeeData.id, employeeData);
+          result = await EmployeeService.update(employeeData.id, employeeData);
+          setEmployees((prev) => prev.map((emp) => (emp.id === result.id ? result : emp)));
           toast.success("Employee updated successfully!");
         } else {
           toast.error("Employee ID is missing. Cannot update employee.");
           return;
         }
       }
-    } catch (error) {
-      console.error("Failed to save employee:", error);
-      toast.error("Failed to save employee. Please try again.");
-    } finally {
       setShowFormPage(false);
       setSelectedEmployee(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to process employee";
+      toast.error(errorMessage);
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -82,7 +97,6 @@ export default function EmployeeManagement() {
   return (
     <Card className="min-h-screen w-full p-4 md:p-8">
       <div className="w-full space-y-6">
-        {/* Header */}
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h1 className="flex items-center gap-2 text-xl font-semibold">
@@ -126,7 +140,7 @@ export default function EmployeeManagement() {
             <EmployeeForm
               defaultValues={selectedEmployee ?? undefined}
               onSubmit={handleFormSubmit}
-              loading={false}
+              loading={formLoading}
               roles={roles}
             />
           </div>
