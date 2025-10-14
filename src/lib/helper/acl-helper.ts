@@ -12,3 +12,10 @@ export function hasAcl(roleAndAcl: Record<string, string[]>, aclKey: string): bo
   }
   return false;
 }
+
+/**
+ * Check if user has any of multiple ACL keys
+ */
+export function hasAnyAcl(roleAndAcl: Record<string, string[]>, aclKeys: string[]): boolean {
+  return aclKeys.some((key) => hasAcl(roleAndAcl, key));
+}
