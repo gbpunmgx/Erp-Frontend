@@ -22,6 +22,12 @@ class AuthService {
     });
     return res.data;
   }
+
+  async logout(): Promise<string> {
+    const res = await this.api.post<{ message: string }>(ENDPOINTS.AUTH.LOGOUT, {});
+    return res.message;
+  }
 }
 
-export default new AuthService();
+const authService = new AuthService();
+export default authService;

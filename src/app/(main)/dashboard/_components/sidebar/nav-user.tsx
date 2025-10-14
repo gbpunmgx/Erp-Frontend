@@ -1,7 +1,7 @@
 "use client";
 
 import { EllipsisVertical, CircleUser, CreditCard, MessageSquareDot, LogOut } from "lucide-react";
-
+import { useDispatch } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { getInitials } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { logout } from "@/core/store/slices/auth-slice";
+import authService from "@/app/login/services/auth-service";
+import { toast } from "sonner";
 
 export function NavUser({
   user,
@@ -25,6 +29,19 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      dispatch(logout());
+      router.push("/login");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Logout failed";
+      toast.error(errorMessage);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -80,7 +97,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

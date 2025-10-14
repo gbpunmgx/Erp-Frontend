@@ -68,7 +68,7 @@ class ApiClient {
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
-        credentials: "include", // ✅ include HTTP-only cookies
+        credentials: "include",
       });
       clearTimeout(timeout);
       return response;
@@ -89,7 +89,6 @@ class ApiClient {
     const responseBody = await this.parseResponseBody<T>(response, url);
 
     if (!response.ok) {
-      // No automatic refresh; backend handles HTTP-only refresh
       this.handleHttpError(response.status, responseBody);
     }
 
