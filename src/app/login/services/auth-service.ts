@@ -2,14 +2,18 @@ import ApiClient from "@/lib/api/api-client";
 import { ENDPOINTS } from "@/utils/endpoints";
 
 export interface LoginResponse {
+  id: number;
   username: string;
-  email: string;
+  email: string | null;
   accessToken: string | null;
   refreshToken: string | null;
   roleAndAcl: Record<string, string[]>;
   organizationId: number;
   branchId: number;
   branchName: string;
+  employeeId?: number | null;
+  employeeName?: string | null;
+  employeeAvatar?: string | null;
 }
 
 class AuthService {

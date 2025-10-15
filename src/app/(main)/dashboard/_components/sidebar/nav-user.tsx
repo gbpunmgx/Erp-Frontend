@@ -1,7 +1,7 @@
 "use client";
 
 import { EllipsisVertical, CircleUser, CreditCard, MessageSquareDot, LogOut } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,19 +18,14 @@ import { useRouter } from "next/navigation";
 import { logout } from "@/core/store/slices/auth-slice";
 import authService from "@/app/login/services/auth-service";
 import { toast } from "sonner";
+import { RootState } from "@/core/store";
 
-export function NavUser({
-  user,
-}: {
-  readonly user: {
-    readonly name: string;
-    readonly email: string;
-    readonly avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const handleLogout = async () => {
     try {
@@ -43,6 +38,8 @@ export function NavUser({
     }
   };
 
+  if (!user) return null;
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -52,17 +49,19 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src="/avatars/arhamkhnz.png" alt={user.username || "User"} />
+                <AvatarFallback className="rounded-lg">{getInitials(user.username || "U")}</AvatarFallback>
               </Avatar>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{user.employeeName}</span>
                 <span className="text-muted-foreground truncate text-xs">{user.email}</span>
               </div>
               <EllipsisVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -72,11 +71,12 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
+                  <AvatarImage src="/data/data/public/avatars/arhamkhnz.png" alt={user.username || "User"} />
+                  <AvatarFallback className="rounded-lg">{getInitials(user.username || "U")}</AvatarFallback>
                 </Avatar>
+
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">{user.username}</span>
                   <span className="text-muted-foreground truncate text-xs">{user.email}</span>
                 </div>
               </div>
