@@ -95,9 +95,6 @@ export default function EmployeeManagement() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="outline">
-              <Download className="mr-1 h-4 w-4" /> Export
-            </Button>
             {!showFormPage ? (
               <Button
                 onClick={() => {

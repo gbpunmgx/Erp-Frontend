@@ -1,31 +1,19 @@
 import {
   Banknote,
-  BookA,
-  BoxesIcon,
-  Building,
-  Building2,
   CalendarCheck,
   Clock,
   CreditCard,
   Crown,
   DatabaseIcon,
-  FileText,
-  Globe,
   History,
   Home,
   IdCard,
-  LockOpen,
   LucideIcon,
   MapPin,
-  Package,
-  ReceiptText,
   Settings,
-  Shield,
   ShieldCheck,
   ShoppingBag,
-  ShoppingCart,
   Tag,
-  UserCog,
   Users,
   Zap,
 } from "lucide-react";
@@ -62,89 +50,6 @@ export const sidebarItems: NavGroup[] = [
         title: "Overview",
         url: "/dashboard",
         icon: Home,
-      },
-    ],
-  },
-  {
-    id: 2,
-    label: "Organization Management",
-    items: [
-      {
-        title: "Purchase",
-        url: "/purchase",
-        icon: ShoppingCart,
-        subItems: [
-          {
-            title: "Purchase Entry",
-            url: "/purchase",
-            icon: Package,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "Inventory Management",
-    items: [
-      {
-        title: "Product Management",
-        url: "/features/product",
-        icon: BoxesIcon,
-        subItems: [
-          {
-            title: "product",
-            url: "/features/product",
-            icon: Building,
-          },
-          {
-            title: "All Organizations",
-            url: "/features/organization/all",
-            icon: Globe,
-          },
-        ],
-      },
-      {
-        title: "Purchase",
-        url: "/purchase",
-        icon: ShoppingCart,
-        subItems: [
-          {
-            title: "Purchase Entry",
-            url: "/purchase",
-            icon: Package,
-          },
-        ],
-      },
-      {
-        title: "Categories",
-        url: "/features/category",
-        icon: Tag,
-        subItems: [
-          {
-            title: "All Categories",
-            url: "/features/category",
-            icon: BookA,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "Voucher",
-    items: [
-      {
-        title: "Voucher",
-        url: "/features/voucher",
-        icon: FileText,
-        subItems: [
-          {
-            title: "Voucher",
-            url: "/features/voucher",
-            icon: ReceiptText,
-          },
-        ],
       },
     ],
   },
