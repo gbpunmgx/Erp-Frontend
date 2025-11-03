@@ -1,76 +1,28 @@
 "use client";
 
-import * as React from "react";
-import {
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React from "react";
 
-import { userColumns } from "@/app/(main)/features/access_control/columns/user-columns";
-import { User } from "@/app/(main)/features/access_control/types/user";
+import { DataTable } from "@/components/common/TabletCommon";
+import { Card } from "@/components/ui/card";
+
+import { columns as userColumns } from "@/app/(main)/features/access_control/columns/user-columns";
 import UserService from "@/app/(main)/features/access_control/services/user-service";
 import { Role } from "@/app/(main)/features/access_control/types/role";
+import { User } from "@/app/(main)/features/access_control/types/user";
 
 interface UsersTableProps {
   users: User[];
   roles: Role[];
-  onUpdateUser: (updatedUser: User) => void; // callback to parent
+  onUpdateUser: (updatedUser: User) => void;
 }
 
-export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [searchColumn, setSearchColumn] = React.useState<string | null>("username");
-  const [searchTerm, setSearchTerm] = React.useState("");
+export function UsersTable({ users, roles, onUpdateUser }: UsersTableProps) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<number | null>(null);
   const [selectedRole, setSelectedRole] = React.useState<number | null>(null);
-
-  const table = useReactTable({
-    data: users,
-    columns: userColumns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
-
-  React.useEffect(() => {
-    table.getColumn(searchColumn ?? "")?.setFilterValue(searchTerm);
-  }, [searchTerm, searchColumn]);
 
   const handleAssignRole = async () => {
     if (!selectedUser || !selectedRole) return;
@@ -86,7 +38,6 @@ export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) 
 
     try {
       await UserService.update(selectedUser, updatedUser);
-      // Pass updated user to parent
       onUpdateUser(updatedUser);
       setDialogOpen(false);
     } catch (error) {
@@ -95,57 +46,8 @@ export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) 
   };
 
   return (
-    <div className="w-full">
-      {/* Search and column toggles */}
-      <div className="flex items-center gap-4 py-4">
-        <Input
-          placeholder={`Search ${searchColumn ?? "column"}...`}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Column: {searchColumn ?? "Select"} <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((col) => col.getCanFilter?.())
-              .map((col) => (
-                <DropdownMenuItem key={col.id} onClick={() => setSearchColumn(col.id)} className="capitalize">
-                  {col.id}
-                </DropdownMenuItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+    <div>
+      {/* <div className="flex items-center gap-4 py-4">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>Assign Role</Button>
@@ -155,11 +57,7 @@ export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) 
               <DialogTitle>Assign Role</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4">
-              <Select
-                value={selectedUser?.toString() ?? ""}
-                onValueChange={(val) => setSelectedUser(Number(val))}
-                className="w-full"
-              >
+              <Select value={selectedUser?.toString() ?? ""} onValueChange={(val) => setSelectedUser(Number(val))}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select User" />
                 </SelectTrigger>
@@ -172,11 +70,7 @@ export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) 
                 </SelectContent>
               </Select>
 
-              <Select
-                value={selectedRole?.toString() ?? ""}
-                onValueChange={(val) => setSelectedRole(Number(val))}
-                className="w-full"
-              >
+              <Select value={selectedRole?.toString() ?? ""} onValueChange={(val) => setSelectedRole(Number(val))}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Role" />
                 </SelectTrigger>
@@ -194,59 +88,16 @@ export function UsersTableDemo({ users, roles, onUpdateUser }: UsersTableProps) 
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </div> */}
 
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={userColumns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
-          </Button>
-        </div>
+      <div className="overflow-x-auto">
+        <DataTable<User>
+          data={users}
+          columns={userColumns}
+          pageSizeOptions={[5, 10, 20]}
+          initialPage={1}
+          initialPageSize={10}
+        />
       </div>
     </div>
   );

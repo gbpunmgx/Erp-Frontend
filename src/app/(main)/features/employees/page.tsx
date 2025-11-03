@@ -1,31 +1,27 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Download, Plus, Shield } from "lucide-react";
-import { Employee } from "@/app/(main)/features/employees/types/employee";
-import { Pagination } from "@/components/common";
-import EmployeeService from "@/app/(main)/features/employees/services/employee-service";
-import EmployeeCard from "@/app/(main)/features/employees/components/employee-card";
-import EmployeeFilters from "@/app/(main)/features/employees/components/employee-filters";
-import EmployeeList from "@/app/(main)/features/employees/components/employee-list";
-import { toast } from "sonner";
 import EmployeeForm from "@/app/(main)/features/employees/components/employee-form";
+import EmployeeList from "@/app/(main)/features/employees/components/employee-list";
+import EmployeeService from "@/app/(main)/features/employees/services/employee-service";
+import { Employee } from "@/app/(main)/features/employees/types/employee";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEmployees } from "@/lib/hooks/api_data/use-employees";
 import { useRoles } from "@/lib/hooks/api_data/use-roles";
+import { Download, Plus, Shield } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function EmployeeManagement() {
   const { employees: initialEmployees, loading } = useEmployees();
   const { roles } = useRoles();
 
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [pageIndex, setPageIndex] = useState(0);
+  const [viewMode] = useState<"grid" | "list">("grid");
+  const [pageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(viewMode === "grid" ? 8 : 10);
-  const [activeTab, setActiveTab] = useState<"employee" | "leave">("employee");
   const [showFormPage, setShowFormPage] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "update">("create");
   const [formLoading, setFormLoading] = useState(false);
@@ -82,16 +78,6 @@ export default function EmployeeManagement() {
     }
   };
 
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-
-  const generateAvatarUrl = (name: string) =>
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=200&background=random`;
-
   if (loading) return <p>Loading employees...</p>;
 
   return (
@@ -145,60 +131,7 @@ export default function EmployeeManagement() {
             />
           </div>
         )}
-
-        {!showFormPage && (
-          <>
-            <EmployeeFilters
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              clearFilters={() => setSearchTerm("")}
-            />
-
-            {viewMode === "grid" ? (
-              <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {paginatedEmployees.map((emp) => (
-                  <EmployeeCard
-                    key={emp.id}
-                    employee={emp}
-                    formatDate={formatDate}
-                    generateAvatarUrl={generateAvatarUrl}
-                    onEdit={() => {
-                      setSelectedEmployee(emp);
-                      setFormMode("update");
-                      setShowFormPage(true);
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <EmployeeList
-                employees={paginatedEmployees}
-                totalItems={filteredEmployees.length}
-                pageIndex={pageIndex}
-                setPageIndex={setPageIndex}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                formatDate={formatDate}
-                generateAvatarUrl={generateAvatarUrl}
-              />
-            )}
-
-            {viewMode === "grid" && (
-              <Pagination
-                totalItems={filteredEmployees.length}
-                pageIndex={pageIndex}
-                setPageIndex={setPageIndex}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                dataSize={`${filteredEmployees.length} items`}
-              />
-            )}
-          </>
-        )}
+        {!showFormPage && <EmployeeList employees={paginatedEmployees} />}
       </div>
     </Card>
   );

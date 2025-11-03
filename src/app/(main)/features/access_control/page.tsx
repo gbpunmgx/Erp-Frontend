@@ -4,9 +4,7 @@ import React, { useState } from "react";
 import { Shield, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-
 import RolesTab from "@/app/(main)/features/access_control/components/roles";
-import { UsersTableDemo } from "@/app/(main)/features/access_control/components/users";
 import type { Role } from "@/app/(main)/features/access_control/types/role";
 
 import UserService from "@/app/(main)/features/access_control/services/user-service";
@@ -15,6 +13,7 @@ import { toast } from "sonner";
 import { useUsers } from "@/lib/hooks/api_data/use-users";
 import { useRoles } from "@/lib/hooks/api_data/use-roles";
 import { usePermissions } from "@/lib/hooks/api_data/use-permissions";
+import { UsersTable } from "./components/users";
 
 const RoleManagementSystem: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"roles" | "users">("roles");
@@ -105,7 +104,7 @@ const RoleManagementSystem: React.FC = () => {
           {loading ? (
             <p className="text-muted-foreground text-sm">Loading users...</p>
           ) : (
-            <UsersTableDemo
+            <UsersTable
               users={users}
               roles={roles}
               onUpdateUser={async (updatedUser) => {

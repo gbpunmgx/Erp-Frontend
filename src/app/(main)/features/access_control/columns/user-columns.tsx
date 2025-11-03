@@ -1,87 +1,49 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { User } from "@/app/(main)/features/access_control/types/user";
+import { Column } from "@/components/common/TabletCommon";
+import { ActionsCell } from "@/lib/actions-cell";
 
-export const userColumns: ColumnDef<User>[] = [
+export const columns: Column<User>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enableColumnFilter: false,
-  },
-  {
-    accessorKey: "username",
+    key: "username",
     header: "Username",
-    cell: ({ row }) => <div>{row.getValue("username")}</div>,
-    enableColumnFilter: true,
+    sortable: true,
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-    enableColumnFilter: true,
+    key: "roleId",
+    header: "Role ID",
+    sortable: true,
   },
   {
-    accessorKey: "roleId",
-    header: "Role",
-    cell: ({ row }) => <div>{row.getValue("roleId")}</div>,
-    enableColumnFilter: true,
-  },
-  {
-    accessorKey: "employeeId",
-    header: "Employee ID",
-    cell: ({ row }) => <div>{row.getValue("employeeId") ?? "N/A"}</div>,
-    enableColumnFilter: false, // ignore in search dropdown
-  },
-  {
-    accessorKey: "password",
-    header: "Password",
-    cell: () => <div>*****</div>,
-    enableColumnFilter: false, // ignore in search dropdown
-  },
-  {
-    accessorKey: "status",
+    key: "status",
     header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status");
-      return (
-        <span
-          className={`rounded-full px-2 py-1 text-xs font-medium ${
-            status ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}
-        >
-          {status ? "Active" : "Inactive"}
-        </span>
-      );
-    },
-    enableColumnFilter: true,
+    sortable: true,
+    render: (value: User["status"]) => (
+      <span
+        className={`rounded-full px-2 py-1 text-xs font-medium ${
+          value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+        }`}
+      >
+        {value ? "Active" : "Inactive"}
+      </span>
+    ),
   },
   {
-    id: "actions",
-    enableHiding: false,
-    cell: () => (
-      <Button variant="ghost" size="sm">
-        <MoreHorizontal className="h-4 w-4" />
-      </Button>
+    key: "actions",
+    header: "Actions",
+    sortable: false,
+    render: (_value, row: User) => (
+      <ActionsCell<User>
+        row={row}
+        onView={(r) => console.log("Viewing user:", r)}
+        onEdit={(r) => console.log("Editing user:", r)}
+        onDelete={(r) => console.log("Deleting user:", r)}
+        actionOptions={{
+          edit: { showInitial: true },
+          delete: { showInitial: true },
+        }}
+      />
     ),
-    enableColumnFilter: false,
   },
 ];
