@@ -109,7 +109,9 @@ const RoleManagementSystem: React.FC = () => {
               roles={roles}
               onUpdateUser={async (updatedUser) => {
                 if (!updatedUser.roleId) return;
-                await handleAssignRole(updatedUser.id, updatedUser.roleId);
+                if (updatedUser.id != null) {
+                  await handleAssignRole(updatedUser.id, updatedUser.roleId);
+                }
               }}
             />
           )}

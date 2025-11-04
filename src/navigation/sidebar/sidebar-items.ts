@@ -17,7 +17,9 @@ import {
   ShoppingBag,
   Tag,
   Users,
+  SettingsIcon,
   Zap,
+  CalendarCogIcon,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -98,7 +100,7 @@ export const sidebarItems: NavGroup[] = [
   },
   {
     id: 4,
-    label: "Settings",
+    label: "Configuration",
     items: [
       {
         title: "Users",
@@ -133,10 +135,22 @@ export const sidebarItems: NavGroup[] = [
           },
         ],
       },
+      {
+        title: "Global Setting ",
+        url: "/features/globalsetting",
+        icon: SettingsIcon,
+        subItems: [
+          {
+            title: "Fiscal Year",
+            url: "/features/fiscalYear",
+            icon: CalendarCogIcon,
+          },
+        ],
+      },
     ],
   },
   {
-    id: 6,
+    id: 5,
     label: "Subscription Management",
     items: [
       {

@@ -24,4 +24,6 @@ export const ENDPOINTS = {
   FEATURE_ACTION: crud("featureActions"),
   ROLE: crud("roles"),
   PAYROLL: crud("payrolls"),
+  ATTENDANCE: crud("attendances"),
+  FISCAL_YEAR: crud("fiscalYears"),
 };

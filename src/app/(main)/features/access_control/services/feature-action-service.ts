@@ -1,7 +1,7 @@
 import ApiClient from "@/lib/api/api-client";
 import { ENDPOINTS } from "@/utils/endpoints";
 import { ApiError } from "@/lib/api/api-error";
-import { FeatureAction } from "@/app/(main)/features/access_control/types/eature-action";
+import { FeatureAction } from "@/app/(main)/features/access_control/types/featuree-action";
 
 class FeatureActionService {
   private api = ApiClient.getInstance();

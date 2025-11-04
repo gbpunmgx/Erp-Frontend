@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import FeatureActionService from "@/app/(main)/features/access_control/services/feature-action-service";
 import { toast } from "sonner";
-import { FeatureAction } from "@/app/(main)/features/access_control/types/eature-action";
+import { FeatureAction } from "@/app/(main)/features/access_control/types/featuree-action";
 
 export const usePermissions = () => {
   const [permissions, setPermissions] = useState<FeatureAction[]>([]);

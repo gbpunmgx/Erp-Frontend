@@ -3,11 +3,11 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Employee } from "@/app/(main)/features/employees/types/employee";
-import { getAttendanceIcon } from "@/app/(main)/features/attendances/components/attendance-icons";
-import { CardHeader, CardTitle } from "@/components/ui/card";
+import { CardTitle } from "@/components/ui/card";
 import { Download, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import getAttendanceIcon from "@/app/(main)/features/attendances/components/attendance-icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AttendanceTableProps {
@@ -73,6 +73,7 @@ export function AttendanceTable({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="2025">2025</SelectItem>
               <SelectItem value="2024">2024</SelectItem>
               <SelectItem value="2023">2023</SelectItem>
               <SelectItem value="2022">2022</SelectItem>
@@ -80,6 +81,7 @@ export function AttendanceTable({
           </Select>
         </div>
       </div>
+
       <table className="w-full border-collapse">
         <thead className="border-b bg-gray-100 dark:bg-gray-800">
           <tr>
@@ -105,7 +107,7 @@ export function AttendanceTable({
         <tbody>
           {employees.map((employee, index) => (
             <tr
-              key={employee.userId ?? employee.id}
+              key={employee.id}
               className={index % 2 === 0 ? "bg-gray-50 dark:bg-gray-900/40" : "bg-white dark:bg-gray-800"}
             >
               <td className="sticky left-0 z-10 border-r bg-gray-50 p-4 dark:bg-gray-900">

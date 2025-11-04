@@ -1,49 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AttendanceTable } from "./components/attendance-table";
 import { Employee } from "../employees/types/employee";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import { Calendar, Search } from "lucide-react";
 import AttendanceDashboard from "../attendances/attendance-list/page";
-
-const employeesData: (Employee & { attendance: string[]; leaveDays: string })[] = [
-  {
-    id: 1,
-    userId: 101,
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "1234567890",
-    dateOfBirth: "1990-01-01",
-    hireDate: "2020-01-01",
-    gender: "MALE",
-    maritalStatus: "SINGLE",
-    attendance: Array(30).fill("P"),
-    leaveDays: "0",
-  },
-  {
-    id: 2,
-    userId: 102,
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@example.com",
-    phone: "0987654321",
-    dateOfBirth: "1992-05-15",
-    hireDate: "2021-06-01",
-    gender: "FEMALE",
-    maritalStatus: "MARRIED",
-    attendance: Array(30)
-      .fill("P")
-      .map((status, i) => (i % 7 === 0 ? "A" : status)),
-    leaveDays: "4",
-  },
-];
+import AttendanceService from "@/app/(main)/features/attendances/services/attendance-service";
+import { Attendance } from "@/app/(main)/features/attendances/types/attendance";
 
 const months = [
   { value: "01", label: "January" },
@@ -62,9 +27,10 @@ const months = [
 
 export default function AttendancePage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("01");
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedMonth, setSelectedMonth] = useState("10"); // default to October
+  const [selectedYear, setSelectedYear] = useState("2025");
   const [open, setOpen] = useState(false);
+  const [employees, setEmployees] = useState<(Employee & { attendance: string[]; leaveDays: string })[]>([]);
 
   const { open: isSidebarOpen } = useSidebar();
 
@@ -76,12 +42,60 @@ export default function AttendancePage() {
   const generateAvatarUrl = (name: string) =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
 
+  // ✅ Fetch attendance on component mount
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        const data: Attendance[] = await AttendanceService.getAll();
+
+        // Group attendance by employee
+        const grouped = data.reduce<Record<number, Attendance[]>>((acc, entry) => {
+          const empId = entry.employee?.id;
+          if (!empId) return acc;
+          if (!acc[empId]) acc[empId] = [];
+          acc[empId].push(entry);
+          return acc;
+        }, {});
+
+        // Transform into the format your table needs
+        const transformedEmployees = Object.entries(grouped).map(([empId, records]) => {
+          const firstRecord = records[0];
+          const employee = firstRecord.employee as Employee;
+
+          // Assuming only one month/year is used at a time
+          const daysInMonth = 30;
+          const attendanceArray = Array(daysInMonth).fill("-");
+
+          records.forEach((record) => {
+            if (record.date) {
+              const day = new Date(record.date).getDate();
+              attendanceArray[day - 1] = record.status;
+            }
+          });
+
+          const leaveCount = attendanceArray.filter((status) => status === "A").length;
+
+          return {
+            ...employee,
+            attendance: attendanceArray,
+            leaveDays: leaveCount.toString(),
+          };
+        });
+
+        setEmployees(transformedEmployees);
+      } catch (err) {
+        console.error("Error fetching attendance:", err);
+      }
+    };
+
+    fetchAttendance();
+  }, [selectedMonth, selectedYear]);
+
   return (
     <div
       className="overflow-x-auto p-4 transition-all duration-300"
       style={{ maxWidth: !isSidebarOpen ? "calc(100% - 16rem)" : "100%" }}
     >
-      {/* Top Bar */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Attendance</h1>
         <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => setOpen(true)}>
@@ -89,9 +103,8 @@ export default function AttendancePage() {
         </Button>
       </div>
 
-      {/* Attendance Table */}
       <AttendanceTable
-        employees={employeesData}
+        employees={employees}
         daysInMonth={30}
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
@@ -104,7 +117,6 @@ export default function AttendancePage() {
         setSelectedYear={setSelectedYear}
       />
 
-      {/* Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
           <DialogHeader>

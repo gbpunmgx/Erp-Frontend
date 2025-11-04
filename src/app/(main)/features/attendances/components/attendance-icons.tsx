@@ -1,31 +1,31 @@
 "use client";
-import React from "react";
 
-export const getAttendanceIcon = (status: string) => {
+import React from "react";
+import { XCircle } from "lucide-react";
+
+function getAttendanceIcon(status: string) {
   switch (status) {
     case "present":
-      return (
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
-          <div className="h-3 w-3 rounded-full bg-blue-500"></div>
-        </div>
-      );
+      return <span className="mx-auto inline-block h-2.5 w-2.5 rounded-full bg-blue-500" title="Present" />;
     case "absent":
       return (
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100">
-          <div className="h-3 w-3 rounded-full bg-red-500"></div>
-        </div>
+        <span title="Absent">
+          <XCircle className="mx-auto h-4 w-4 text-red-500" />
+        </span>
       );
-    case "late":
+    case "leave":
       return (
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
-          <div className="h-3 w-3 rounded-full bg-orange-500"></div>
-        </div>
+        <span className="font-bold text-yellow-500" title="Leave">
+          L
+        </span>
       );
     default:
       return (
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100">
-          <div className="h-3 w-3 rounded-full bg-gray-400"></div>
-        </div>
+        <span className="text-gray-400" title="No Data">
+          –
+        </span>
       );
   }
-};
+}
+
+export default getAttendanceIcon;
