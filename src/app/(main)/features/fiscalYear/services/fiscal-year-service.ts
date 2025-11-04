@@ -11,7 +11,7 @@ class FiscalYearService {
       const res = await this.api.get<{ data: FiscalYear[]; message: string }>(ENDPOINTS.FISCAL_YEAR.GET_ALL);
       return res.data;
     } catch (error) {
-      throw this.handleError(error, "Failed to fetch employees.");
+      throw this.handleError(error, "Failed to fetch fiscal years.");
     }
   }
 
@@ -20,28 +20,28 @@ class FiscalYearService {
       const res = await this.api.get<{ data: FiscalYear; message: string }>(`${ENDPOINTS.FISCAL_YEAR.GET_BY_ID}${id}`);
       return res.data;
     } catch (error) {
-      throw this.handleError(error, `Failed to fetch employee with ID ${id}.`);
+      throw this.handleError(error, `Failed to fetch fiscal year with ID ${id}.`);
     }
   }
 
-  async create(employee: FiscalYear): Promise<FiscalYear> {
+  async create(fiscalYear: FiscalYear): Promise<FiscalYear> {
     try {
-      const res = await this.api.post<{ data: FiscalYear; message: string }>(ENDPOINTS.FISCAL_YEAR.CREATE, employee);
+      const res = await this.api.post<{ data: FiscalYear; message: string }>(ENDPOINTS.FISCAL_YEAR.CREATE, fiscalYear);
       return res.data;
     } catch (error) {
-      throw this.handleError(error, "Failed to create employee.");
+      throw this.handleError(error, "Failed to create fiscal year.");
     }
   }
 
-  async update(id: number, employee: FiscalYear): Promise<FiscalYear> {
+  async update(id: number, fiscalYear: FiscalYear): Promise<FiscalYear> {
     try {
       const res = await this.api.put<{ data: FiscalYear; message: string }>(
         `${ENDPOINTS.FISCAL_YEAR.UPDATE}${id}`,
-        employee,
+        fiscalYear,
       );
       return res.data;
     } catch (error) {
-      throw this.handleError(error, `Failed to update employee with ID ${id}.`);
+      throw this.handleError(error, `Failed to update fiscal year with ID ${id}.`);
     }
   }
 
@@ -49,7 +49,7 @@ class FiscalYearService {
     try {
       await this.api.delete(`${ENDPOINTS.FISCAL_YEAR.DELETE}${id}`);
     } catch (error) {
-      throw this.handleError(error, `Failed to delete employee with ID ${id}.`);
+      throw this.handleError(error, `Failed to delete fiscal year with ID ${id}.`);
     }
   }
 
@@ -58,7 +58,6 @@ class FiscalYearService {
       throw error;
     }
     const errorMessage = error instanceof Error ? error.message : fallbackMessage;
-    console.error("[EmployeeService] Unexpected error:", error);
     throw new ApiError(0, errorMessage, { cause: error });
   }
 }
