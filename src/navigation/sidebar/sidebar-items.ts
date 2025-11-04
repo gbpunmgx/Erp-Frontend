@@ -1,6 +1,7 @@
 import {
   Banknote,
   CalendarCheck,
+  ClipboardList,
   Clock,
   CreditCard,
   Crown,
@@ -11,6 +12,7 @@ import {
   LucideIcon,
   MapPin,
   Settings,
+  Shapes,
   ShieldCheck,
   ShoppingBag,
   Tag,
@@ -54,7 +56,7 @@ export const sidebarItems: NavGroup[] = [
     ],
   },
   {
-    id: 4,
+    id: 2,
     label: "Live Location",
     items: [
       {
@@ -72,7 +74,30 @@ export const sidebarItems: NavGroup[] = [
     ],
   },
   {
-    id: 5,
+    id: 3,
+    label: "Asset Management",
+    items: [
+      {
+        title: "Assets",
+        url: "/features/assets/",
+        icon: Shapes,
+        subItems: [
+          {
+            title: "List Assets",
+            url: "/features/assets/assets_list",
+            icon: ClipboardList,
+          },
+          {
+            title: "Assign Assets",
+            url: "/features/assets/assign_assets",
+            icon: ClipboardList,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
     label: "Settings",
     items: [
       {

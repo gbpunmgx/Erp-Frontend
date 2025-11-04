@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEmployees } from "@/lib/hooks/api_data/use-employees";
 import { useRoles } from "@/lib/hooks/api_data/use-roles";
-import { Download, Plus, Shield } from "lucide-react";
+import { Plus, Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 

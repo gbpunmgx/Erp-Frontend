@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Command } from "lucide-react";
+import { Code, Code2Icon, Command } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,7 +25,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="#">
-                <Command />
+                <Code2Icon />
                 <span className="text-base font-semibold">{APP_CONFIG.name}</span>
               </a>
             </SidebarMenuButton>
