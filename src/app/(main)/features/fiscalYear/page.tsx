@@ -2,7 +2,7 @@
 
 import { PageContainer } from "@/components/common/page-container";
 import { DataTable } from "@/components/common/TabletCommon";
-import { useFiscalYear } from "@/lib/hooks/api_data/use-fiscal=year";
+import { useFiscalYear } from "@/lib/hooks/api_data/use-fiscal-year";
 import { CalendarCogIcon } from "lucide-react";
 import { useEffect } from "react";
 import { fiscalYearColumns } from "./fiscal-year-columns";

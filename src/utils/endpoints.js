@@ -26,4 +26,5 @@ export const ENDPOINTS = {
   PAYROLL: crud("payrolls"),
   ATTENDANCE: crud("attendances"),
   FISCAL_YEAR: crud("fiscalYears"),
+  DEPARTMENT: crud("departments"),
 };

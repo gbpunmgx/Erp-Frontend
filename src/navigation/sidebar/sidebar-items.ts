@@ -20,6 +20,7 @@ import {
   SettingsIcon,
   Zap,
   CalendarCogIcon,
+  Building2Icon,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -144,6 +145,11 @@ export const sidebarItems: NavGroup[] = [
             title: "Fiscal Year",
             url: "/features/fiscalYear",
             icon: CalendarCogIcon,
+          },
+          {
+            title: "Department",
+            url: "/features/departments",
+            icon: Building2Icon,
           },
         ],
       },
